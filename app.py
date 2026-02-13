@@ -549,28 +549,39 @@ def delete_location(loc_id):
 
 # --- Auth ---
 
-def send_email(recipient, subject, body):
-    print(f"Sending email to {recipient}...")
-    sender = "orivexreply@gmail.com"
-    password = "ctczkbzxnkmhtxfx"
-    msg = MIMEText(body)
-    msg['Subject'] = subject
-    msg['From'] = sender
-    msg['To'] = recipient
+import threading
+
+def send_email_async(recipient, subject, body):
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        print(f"Sending email to {recipient} (Async)...")
+        sender = "orivexreply@gmail.com"
+        password = "ctczkbzxnkmhtxfx"
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = sender
+        msg['To'] = recipient
+        
+        # Use Port 587 and STARTTLS
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.starttls()
             smtp.login(sender, password)
             smtp.send_message(msg)
             print("Email sent successfully!")
-        return True, "Email sent successfully"
     except Exception as e:
         print(f"SMTP Error details: {e}")
         import traceback
         traceback.print_exc()
-        # Log to Render/Console explicitly
         import sys
         print(f"EMAIL FAILED: {str(e)}", file=sys.stderr)
-        return False, str(e)
+
+def send_email(recipient, subject, body):
+    # Determine URL
+    # Hardcoded or Env Var
+    # Start thread
+    t = threading.Thread(target=send_email_async, args=(recipient, subject, body))
+    t.start()
+    return True, "Email queued"
+
 
 @app.route('/api/auth/reset-password-request', methods=['POST'])
 def reset_password_request():
