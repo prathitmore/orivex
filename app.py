@@ -634,12 +634,12 @@ def reset_password_confirm():
     return jsonify({"success": True})
 
 # --- Init ---
-with app.app_context():
-    # Run once at startup
-    try:
-        init_schema()
-    except Exception as e:
-        print(f"Startup Schema Init Warning: {e}")
+# with app.app_context():
+#    # Run once at startup
+#    try:
+#        init_schema()
+#    except Exception as e:
+#        print(f"Startup Schema Init Warning: {e}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
