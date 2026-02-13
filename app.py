@@ -223,7 +223,8 @@ def create_user():
 
     # Send Welcome Email
     try:
-        email_body = f"Welcome {data['name']}!\n\nYour Orivex account has been created.\nUsername: {username}\nPassword: {data['password']}\n\nLogin here: http://localhost:5000"
+        login_url = "https://orivex-1.onrender.com" # Updated for production
+        email_body = f"Welcome {data['name']}!\n\nYour Orivex account has been created.\nUsername: {username}\nPassword: {data['password']}\n\nLogin here: {login_url}"
         send_email(username, "Your Orivex Account Credentials", email_body)
     except Exception as e:
         print(f"Failed to send welcome email: {e}")
@@ -551,7 +552,7 @@ def delete_location(loc_id):
 def send_email(recipient, subject, body):
     print(f"Sending email to {recipient}...")
     sender = "orivexreply@gmail.com"
-    password = "Orivex@143"
+    password = "ctcz kbzx nkmh txfx"
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = sender
@@ -564,7 +565,11 @@ def send_email(recipient, subject, body):
         return True, "Email sent successfully"
     except Exception as e:
         print(f"SMTP Error details: {e}")
+        import traceback
         traceback.print_exc()
+        # Log to Render/Console explicitly
+        import sys
+        print(f"EMAIL FAILED: {str(e)}", file=sys.stderr)
         return False, str(e)
 
 @app.route('/api/auth/reset-password-request', methods=['POST'])
