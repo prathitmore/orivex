@@ -1,5 +1,4 @@
 
-# Deploy Trigger: v1.1
 import mimetypes
 import os
 import urllib.parse
@@ -15,16 +14,21 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 import traceback
+from whitenoise import WhiteNoise
 
 # --- Configuration ---
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-mimetypes.add_type('application/javascript', '.js')
-mimetypes.add_type('text/css', '.css')
-mimetypes.add_type('image/svg+xml', '.svg')
+# mimetypes.add_type('application/javascript', '.js') # Let whitenoise handle it
+# mimetypes.add_type('text/css', '.css')
+# mimetypes.add_type('image/svg+xml', '.svg')
 
-app = Flask(__name__, static_folder=BASE_DIR, static_url_path='')
+app = Flask(__name__) # No static_folder=BASE_DIR needed with WhiteNoise
 CORS(app)
+
+# Allow serving from root directory (Be careful with secrets in production usually, but ok for now)
+app.wsgi_app = WhiteNoise(app.wsgi_app, root=BASE_DIR, prefix='/', index_file='index.html', autorefresh=True)
+
 
 # Database Config
 # Fix user's password encoding: Superbase@143 -> Superbase%40143
