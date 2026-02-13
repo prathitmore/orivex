@@ -552,7 +552,7 @@ def delete_location(loc_id):
 def send_email(recipient, subject, body):
     print(f"Sending email to {recipient}...")
     sender = "orivexreply@gmail.com"
-    password = "ctcz kbzx nkmh txfx"
+    password = "ctczkbzxnkmhtxfx"
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = sender
