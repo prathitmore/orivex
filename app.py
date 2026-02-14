@@ -14,20 +14,16 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 import traceback
-from whitenoise import WhiteNoise
+# from whitenoise import WhiteNoise
 
 # --- Configuration ---
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# mimetypes.add_type('application/javascript', '.js') # Let whitenoise handle it
-# mimetypes.add_type('text/css', '.css')
-# mimetypes.add_type('image/svg+xml', '.svg')
-
-app = Flask(__name__) # No static_folder=BASE_DIR needed with WhiteNoise
+app = Flask(__name__) 
 CORS(app)
 
-# Allow serving from root directory (Be careful with secrets in production usually, but ok for now)
-app.wsgi_app = WhiteNoise(app.wsgi_app, root=BASE_DIR, prefix='/', index_file='index.html', autorefresh=True)
+# Allow serving from root directory - NOT NEEDED on Netlify (Static files served by CDN)
+# app.wsgi_app = WhiteNoise(app.wsgi_app, root=BASE_DIR, prefix='/', index_file='index.html', autorefresh=True)
 
 
 # Database Config
