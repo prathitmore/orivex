@@ -142,7 +142,7 @@ def create_user():
 
     # Send Welcome Email
     try:
-        login_url = "https://orivex-1.onrender.com" # Updated for production
+        login_url = request.url_root.rstrip('/')  # Dynamic URL based on current host
         email_body = f"Welcome {data['name']}!\n\nYour Orivex account has been created.\nUsername: {username}\nPassword: {data['password']}\n\nLogin here: {login_url}"
         send_email(username, "Your Orivex Account Credentials", email_body)
     except Exception as e:
