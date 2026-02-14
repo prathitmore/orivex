@@ -9,7 +9,7 @@
 # Specific rule for API with FORCE to prevent fallback
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api"
+  to = "/.netlify/functions/api/:splat"  # Use :splat to pass the rest of the path
   status = 200
   force = true
 
