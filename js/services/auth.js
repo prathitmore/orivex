@@ -7,7 +7,8 @@ import { DataService } from './data.js';
 // So api/login becomes /.netlify/functions/api/api/login potentially?
 // No, apig-wsgi handles this usually.
 // Let's try pointing directly to the function endpoint.
-const API_BASE = '/.netlify/functions/api';
+// Revert to relative path for standard deployments (Ngrok, PythonAnywhere, Render)
+const API_BASE = '/api';
 const USER_STORAGE_KEY = 'orivex_user';
 
 export const AuthService = {
@@ -52,7 +53,8 @@ export const AuthService = {
 
     async login(name, password) {
         try {
-            const res = await fetch(`${API_BASE}/login`, {
+            // Adding cache breaker
+            const res = await fetch(`${API_BASE}/login?ts=${Date.now()}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, password })
