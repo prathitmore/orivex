@@ -19,7 +19,7 @@ import traceback
 # --- Configuration ---
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-app = Flask(__name__) 
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
 # Allow serving from root directory - NOT NEEDED on Netlify (Static files served by CDN)
