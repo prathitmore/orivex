@@ -1,5 +1,5 @@
 
-const API_BASE = '/api';
+const API_BASE = '/.netlify/functions/api';
 
 export const DataService = {
     async getUsers() {

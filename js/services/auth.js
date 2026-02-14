@@ -1,7 +1,13 @@
 
 import { DataService } from './data.js';
 
-const API_BASE = '/api';
+// Direct function access is more reliable if redirects are tricky
+// But Flask expects its own routes.
+// The Flask app is mounted at /.netlify/functions/api
+// So api/login becomes /.netlify/functions/api/api/login potentially?
+// No, apig-wsgi handles this usually.
+// Let's try pointing directly to the function endpoint.
+const API_BASE = '/.netlify/functions/api';
 const USER_STORAGE_KEY = 'orivex_user';
 
 export const AuthService = {
