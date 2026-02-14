@@ -12,26 +12,19 @@ from apig_wsgi import make_lambda_handler
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.insert(0, root)
 
-from app import app
-
-# Create the handler
-# We need to make sure the event object is what apig_wsgi expects.
-# Netlify Functions (AWS Lambda) pass an event.
-# If path is /api/login, Flask expects /api/login.
-# apig_wsgi should handle this. 
-
-# One common issue: The 'path' in the event might be relative to the function.
-# Let's try to debug or simplify.
-# Actually, let's switch to a simpler manual adapter to transparency.
-
-import json
+try:
+    from app import app
+    from apig_wsgi import make_lambda_handler
+    _handler = make_lambda_handler(app, binary_support=True)
+except Exception as e:
+    import traceback
+    err = traceback.format_exc()
+    def _handler(event, context):
+        return {
+            "statusCode": 500,
+            "headers": {"Content-Type": "text/plain"},
+            "body": f"Startup/Import Error:\n{err}\n\nSys Path: {sys.path}"
+        }
 
 def handler(event, context):
-    # This is a very basic adapter to see if code is running at all.
-    # If this works, the issue was the WSGI adapter.
-    
-    # Construct a WSGI environ from the event
-    # This is complex. Let's try to fix path issue first.
-    
-    # Standard fix: explicitly pass context
-    return make_lambda_handler(app, binary_support=True)(event, context)
+    return _handler(event, context)
