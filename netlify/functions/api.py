@@ -1,52 +1,36 @@
 import sys
 import os
+import logging
+import traceback
 from apig_wsgi import make_lambda_handler
 
-# Ensure dependencies are available
-# If using Netlify's build, libraries are installed in site-packages
-# But we need to make sure 'app' is importable.
-# Netlify usually zips the function directory. If we put 'app.py' in root, we might need to adjust.
-# However, standard practice: import from parent.
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
-# Add project root and local libs to sys.path
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-libs = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs'))
-sys.path.insert(0, libs)
 sys.path.insert(0, root)
+
+_handler = None
+_error_html = ""
 
 try:
     from app import app
-    from apig_wsgi import make_lambda_handler
-    _flask_handler = make_lambda_handler(app, binary_support=True)
-except Exception as e:
-    import traceback
-    _trace = traceback.format_exc()
-    _flask_handler = None
+    _handler = make_lambda_handler(app, binary_support=True)
+except Exception:
+    _error_html = f"<html><body><h1>Startup Error</h1><pre>{traceback.format_exc()}</pre><pre>SysPath: {sys.path}</pre></body></html>"
+    logger.error("Failed to import app", exc_info=True)
 
 def handler(event, context):
-    # Debugging: Check if imports failed
-    if _flask_handler is None:
+    if _handler is None:
         return {
             "statusCode": 500,
-            "headers": {"Content-Type": "text/plain"},
-            "body": f"Import/Startup Error:\n{_trace}\n\nSysPath: {sys.path}"
+            "headers": {"Content-Type": "text/html"},
+            "body": _error_html
         }
     
-    # Path/Routing Fix
-    # The event path from Netlify is typically long (e.g. /.netlify/functions/api/login)
-    # But Flask routes are defined as /api/login.
-    # We need to strip the prefix so Flask sees what it expects.
-    current_path = event.get('path', '')
-    if current_path.startswith('/.netlify/functions/api'):
-        # Replace the function preamble with just /api to match Flask routes
-        # e.g. /.netlify/functions/api/login -> /api/login
-        event['path'] = current_path.replace('/.netlify/functions/api', '/api', 1)
-        
-    try:
-        response = _flask_handler(event, context)
-        return response
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": f"Runtime Handler Error: {str(e)}"
-        }
+    path = event.get('path', '')
+    if path.startswith('/.netlify/functions/api'):
+         event['path'] = path.replace('/.netlify/functions/api', '/api', 1)
+
+    return _handler(event, context)
