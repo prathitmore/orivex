@@ -31,10 +31,19 @@ app.wsgi_app = WhiteNoise(app.wsgi_app, root=BASE_DIR, prefix='/', index_file='i
 
 
 # Database Config
-# Fix user's password encoding: Superbase@143 -> Superbase%40143
-encoded_pass = urllib.parse.quote_plus("Superbase@143")
-# Construct the URI (Transaction Pooler)
-db_uri = f"postgresql://postgres.bvhhtssbdklleqperxoz:{encoded_pass}@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
+# Try to get from Environment (Netlify/Production)
+db_uri = os.environ.get('DATABASE_URL')
+
+# Fallback for Local Development if not set
+if not db_uri:
+    # Fix user's password encoding: Superbase@143 -> Superbase%40143
+    encoded_pass = urllib.parse.quote_plus("Superbase@143")
+    # Construct the URI (Transaction Pooler)
+    db_uri = f"postgresql://postgres.bvhhtssbdklleqperxoz:{encoded_pass}@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
+
+# Ensure correct protocol for SQLAlchemy (postgres:// -> postgresql://)
+if db_uri and db_uri.startswith("postgres://"):
+    db_uri = db_uri.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
