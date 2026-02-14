@@ -1,9 +1,10 @@
 
-const API_BASE = '/.netlify/functions/api';
+const API_BASE = '/api';
 
 export const DataService = {
     async getUsers() {
-        const res = await fetch(`${API_BASE}/users`);
+        // Add cache bust to prevent 404s from stale service worker/browser cache
+        const res = await fetch(`${API_BASE}/users?ts=${Date.now()}`);
         return await res.json();
     },
 
