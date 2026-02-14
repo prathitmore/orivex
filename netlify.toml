@@ -1,6 +1,6 @@
 [build]
-  command = "bash build.sh"
-  publish = "."
+  command = "# No build command needed for Flask API only"
+  publish = "/"
 
 [functions]
   directory = "netlify/functions"
