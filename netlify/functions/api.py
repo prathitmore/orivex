@@ -2,7 +2,6 @@ import sys
 import os
 import logging
 import traceback
-from apig_wsgi import make_lambda_handler
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -15,9 +14,14 @@ _handler = None
 _error_html = ""
 
 try:
+    from apig_wsgi import make_lambda_handler
     from app import app
     _handler = make_lambda_handler(app, binary_support=True)
 except Exception:
+    _error_html = f"<html><body><h1>Startup Error</h1><pre>{traceback.format_exc()}</pre><pre>SysPath: {sys.path}</pre></body></html>"
+    logger.error("Failed to import app or dependencies", exc_info=True)
+
+def handler(event, context):
     _error_html = f"<html><body><h1>Startup Error</h1><pre>{traceback.format_exc()}</pre><pre>SysPath: {sys.path}</pre></body></html>"
     logger.error("Failed to import app", exc_info=True)
 

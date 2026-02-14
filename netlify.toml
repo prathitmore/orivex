@@ -1,5 +1,5 @@
 [build]
-  command = "# No build command needed for Flask API only"
+  command = "pip install -r requirements.txt"
   publish = "/"
 
 [functions]
