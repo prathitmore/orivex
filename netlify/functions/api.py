@@ -8,14 +8,15 @@ from apig_wsgi import make_lambda_handler
 # Netlify usually zips the function directory. If we put 'app.py' in root, we might need to adjust.
 # However, standard practice: import from parent.
 
-# Add project root to sys.path
+# Add project root and local libs to sys.path
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+libs = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs'))
+sys.path.insert(0, libs)
 sys.path.insert(0, root)
 
 try:
     from app import app
     from apig_wsgi import make_lambda_handler
-    # Standard handler
     _flask_handler = make_lambda_handler(app, binary_support=True)
 except Exception as e:
     import traceback
@@ -28,27 +29,24 @@ def handler(event, context):
         return {
             "statusCode": 500,
             "headers": {"Content-Type": "text/plain"},
-            "body": f"Import Error:\n{_trace}\n\nSysPath: {sys.path}"
+            "body": f"Import/Startup Error:\n{_trace}\n\nSysPath: {sys.path}"
         }
     
-    # Debugging: Check path
-    # Flask expects /api/login. The event path might be /.netlify/functions/api/login
-    # We might need to rewrite the path for Flask
-    path = event.get('path', '')
-    
-    # If using direct function access, path might be /.netlify/functions/api/login
-    # Flask routes are defined as /api/...
-    # So if the path contains /api/, we are probably good?
-    # Let's try to run it.
-    
+    # Path/Routing Fix
+    # The event path from Netlify is typically long (e.g. /.netlify/functions/api/login)
+    # But Flask routes are defined as /api/login.
+    # We need to strip the prefix so Flask sees what it expects.
+    current_path = event.get('path', '')
+    if current_path.startswith('/.netlify/functions/api'):
+        # Replace the function preamble with just /api to match Flask routes
+        # e.g. /.netlify/functions/api/login -> /api/login
+        event['path'] = current_path.replace('/.netlify/functions/api', '/api', 1)
+        
     try:
         response = _flask_handler(event, context)
-        # If Flask returns 404, intercept it to show debug info
-        if response.get('statusCode') == 404:
-            response['body'] = f"Flask 404. Path requested: {path}. Event keys: {list(event.keys())}"
         return response
     except Exception as e:
         return {
             "statusCode": 500,
-            "body": f"Handler Error: {str(e)}"
+            "body": f"Runtime Handler Error: {str(e)}"
         }
