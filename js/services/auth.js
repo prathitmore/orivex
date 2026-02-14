@@ -52,18 +52,26 @@ export const AuthService = {
                 body: JSON.stringify({ name, password })
             });
 
-            const data = await res.json();
-            if (data.success) {
-                const user = data.user;
-                // Add currentRole for UI
-                user.currentRole = user.roles[0];
-                sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-                return { success: true, user };
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await res.json();
+                if (data.success) {
+                    const user = data.user;
+                    // Add currentRole for UI
+                    user.currentRole = user.roles[0];
+                    sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+                    return { success: true, user };
+                } else {
+                    return { success: false, message: data.message };
+                }
             } else {
-                return { success: false, message: data.message };
+                const text = await res.text();
+                console.error("Non-JSON response:", text);
+                return { success: false, message: `Server Error (${res.status}): ${text.substring(0, 100)}` };
             }
         } catch (e) {
-            return { success: false, message: 'Server error' };
+            console.error("Login Exception:", e);
+            return { success: false, message: `Network/Client Error: ${e.message}` };
         }
     },
 
