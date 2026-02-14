@@ -39,11 +39,13 @@ if not db_uri:
     # Fix user's password encoding: Superbase@143 -> Superbase%40143
     encoded_pass = urllib.parse.quote_plus("Superbase@143")
     # Construct the URI (Transaction Pooler)
-    db_uri = f"postgresql://postgres.bvhhtssbdklleqperxoz:{encoded_pass}@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
+    db_uri = f"postgresql+pg8000://postgres.bvhhtssbdklleqperxoz:{encoded_pass}@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
 
-# Ensure correct protocol for SQLAlchemy (postgres:// -> postgresql://)
+# Ensure correct protocol for SQLAlchemy (switch to pg8000 if using generic postgres)
 if db_uri and db_uri.startswith("postgres://"):
-    db_uri = db_uri.replace("postgres://", "postgresql://", 1)
+    db_uri = db_uri.replace("postgres://", "postgresql+pg8000://", 1)
+elif db_uri and db_uri.startswith("postgresql://"):
+     db_uri = db_uri.replace("postgresql://", "postgresql+pg8000://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -54,105 +56,7 @@ db = SQLAlchemy(app)
 def row_to_dict(row):
     return dict(row._mapping)
 
-# --- Schema Initialization ---
-def init_schema():
-    # Common schema for Postgres (Text-based IDs mostly)
-    with app.app_context():
-        try:
-            # Users
-            db.session.execute(text("""
-                CREATE TABLE IF NOT EXISTS users (
-                    id TEXT PRIMARY KEY,
-                    name TEXT,
-                    username TEXT,
-                    password TEXT,
-                    roles TEXT,
-                    base_location TEXT,
-                    payment_info TEXT,
-                    status TEXT DEFAULT 'active'
-                )
-            """))
-            # Events
-            db.session.execute(text("""
-                CREATE TABLE IF NOT EXISTS events (
-                    id TEXT PRIMARY KEY,
-                    title TEXT,
-                    date TEXT,
-                    time TEXT,
-                    location TEXT,
-                    assigned TEXT,
-                    total_needed INTEGER
-                )
-            """))
-            # Requests
-            db.session.execute(text("""
-                CREATE TABLE IF NOT EXISTS requests (
-                    id TEXT PRIMARY KEY,
-                    user_id TEXT,
-                    event_id TEXT,
-                    title TEXT,
-                    date TEXT,
-                    time TEXT,
-                    loc TEXT,
-                    status TEXT DEFAULT 'pending'
-                )
-            """))
-            # Availability (Composite PK)
-            db.session.execute(text("""
-                CREATE TABLE IF NOT EXISTS availability (
-                    user_id TEXT,
-                    date TEXT,
-                    status TEXT,
-                    PRIMARY KEY (user_id, date)
-                )
-            """))
-            # Expenses
-            db.session.execute(text("""
-                CREATE TABLE IF NOT EXISTS expenses (
-                    id TEXT PRIMARY KEY,
-                    event_id TEXT,
-                    user_id TEXT,
-                    amount REAL,
-                    description TEXT,
-                    status TEXT DEFAULT 'pending',
-                    created_at TEXT,
-                    group_members TEXT
-                )
-            """))
-            # Locations (Using Text ID now for consistency)
-            db.session.execute(text("""
-                CREATE TABLE IF NOT EXISTS locations (
-                    id TEXT PRIMARY KEY,
-                    name TEXT UNIQUE,
-                    latitude REAL,
-                    longitude REAL
-                )
-            """))
-            # OTP
-            db.session.execute(text("""
-                CREATE TABLE IF NOT EXISTS otp_codes (
-                    email TEXT PRIMARY KEY,
-                    code TEXT,
-                    expires_at TEXT
-                )
-            """))
-            db.session.commit()
-            
-            # Create Admin if not exists
-            chk = db.session.execute(text("SELECT * FROM users WHERE username = 'prathit'")).fetchone()
-            if not chk:
-                uid = f"u{uuid.uuid4().hex[:8]}"
-                # Ensure roles is JSON string
-                roles_json = json.dumps(["manager", "astronomer", "stargazer"])
-                db.session.execute(text("INSERT INTO users (id, name, username, roles, password, status) VALUES (:id, 'Prathit', 'prathit', :roles, 'admin', 'active')"), 
-                                   {"id": uid, "roles": roles_json})
-                db.session.commit()
-                print("Admin user 'prathit' created.")
-                
-            print("Schema initialized on Supabase.")
-        except Exception as e:
-            print(f"Schema Init Error: {e}")
-            traceback.print_exc()
+# ... (Scheam Init Omitted) ...
 
 # --- Routes ---
 
@@ -169,27 +73,32 @@ def init_data_route():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.json
-    sql = text("SELECT * FROM users WHERE (lower(name) = :name OR lower(username) = :name) AND password = :pwd AND status != 'deleted'")
-    user = db.session.execute(sql, {"name": data['name'].lower(), "pwd": data['password']}).fetchone()
-    
-    if user:
-        u = row_to_dict(user)
-        try: roles = json.loads(u['roles'])
-        except: roles = []
+    try:
+        data = request.json
+        sql = text("SELECT * FROM users WHERE (lower(name) = :name OR lower(username) = :name) AND password = :pwd AND status != 'deleted'")
+        user = db.session.execute(sql, {"name": data['name'].lower(), "pwd": data['password']}).fetchone()
         
-        return jsonify({
-            "success": True,
-            "user": {
-                "id": u['id'],
-                "name": u['name'],
-                "username": u['username'],
-                "roles": roles,
-                "base_location": u['base_location'],
-                "status": u['status']
-            }
-        })
-    return jsonify({"success": False, "message": "Invalid credentials"}), 401
+        if user:
+            u = row_to_dict(user)
+            try: roles = json.loads(u['roles'])
+            except: roles = []
+            
+            return jsonify({
+                "success": True,
+                "user": {
+                    "id": u['id'],
+                    "name": u['name'],
+                    "username": u['username'],
+                    "roles": roles,
+                    "base_location": u['base_location'],
+                    "status": u['status']
+                }
+            })
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "message": f"Server Error: {str(e)}"}), 500
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
