@@ -1,12 +1,20 @@
 [build]
-  command = "pip install -r requirements.txt"
-  publish = "/"
+  publish = "."
+  command = "echo 'No build command'"
 
 [functions]
   directory = "netlify/functions"
-  included_files = ["index.html", "assets/**", "css/**", "js/**"]
+  included_files = ["app.py", "requirements.txt", "js/**", "css/**", "assets/**", "index.html"]
 
+# Specific rule for API with FORCE to prevent fallback
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api"
+  status = 200
+  force = true
+
+# Fallback for everything else to index.html (SPA)
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/api"
+  to = "/index.html"
   status = 200
