@@ -68,7 +68,11 @@ def init_data_route():
 
 # --- Users API ---
 
-@app.route('/api/login', methods=['POST'])
+@app.before_request
+def log_request_info():
+    print(f"DEBUG REQ: {request.method} {request.path}")
+
+@app.route('/api/login', methods=['POST', 'OPTIONS'])
 def login():
     try:
         data = request.json
