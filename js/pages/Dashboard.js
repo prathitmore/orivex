@@ -194,7 +194,7 @@ async function createUpcomingEventsWidget() {
                             <div style="font-size: 0.85rem; margin-bottom: 2px;">📅 ${dateStr} • ${evt.time}</div>
                             <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 0;">📍 ${evt.location.split(',')[0]}</div>
                         </div>
-                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; width: 80px; height: 80px; text-align: center; padding: 4px 0; border-radius: 16px; gap: 0;">
+                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; width: 90px; height: 90px; text-align: center; padding: 4px 0; border-radius: 18px; gap: 0;">
                             <div style="font-size: 0.7rem;">Loading...</div>
                         </div>
                     </div>
@@ -305,9 +305,9 @@ async function fetchWeatherForEvent(event, badge) {
         }
 
         badge.innerHTML = `
-            <div style="font-size: 1.6rem; line-height: 1;">☁️</div>
-            <div style="font-size: 0.95rem; font-weight: 700; line-height: 1;">${Math.round(cloudCover)}%</div>
-            <div style="font-size: 1.2rem; line-height: 1;">${emoji}</div>
+            <div style="font-size: 1.7rem; line-height: 1;">☁️</div>
+            <div style="font-size: 1rem; font-weight: 700; line-height: 1;">${Math.round(cloudCover)}%</div>
+            <div style="font-size: 1.3rem; line-height: 1;">${emoji}</div>
         `;
 
         // Update color
