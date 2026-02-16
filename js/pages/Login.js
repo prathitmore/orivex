@@ -16,7 +16,9 @@ export function LoginPage() {
     card.innerHTML = `
 
 
-        <img src="assets/orivex_logo.png" alt="Orivex" style="max-height: 100px; width: auto; margin-bottom: var(--spacing-sm);">
+
+        <img src="assets/orivex_logo.png" alt="Orivex" style="width: 80%; max-width: 350px; height: auto; margin-bottom: var(--spacing-sm);">
+
 
 
         <p style="margin-bottom: var(--spacing-xl);">Workforce Coordination</p>

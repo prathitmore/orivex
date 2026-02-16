@@ -21,7 +21,9 @@ export function Layout(content) {
 
     header.innerHTML = `
 
-        <img src="assets/orivex_logo.png" alt="Orivex" style="height: 40px;">
+
+        <img src="assets/orivex_logo.png" alt="Orivex" style="height: 50px;">
+
 
         <div id="user-avatar" style="width: 32px; height: 32px; background: var(--color-bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;">
             <!-- Avatar initial -->
