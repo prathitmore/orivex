@@ -136,7 +136,7 @@ async function createUpcomingEventsWidget() {
     section.style.marginBottom = 'var(--spacing-lg)';
 
     section.innerHTML = `
-        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-sm);">
+        <div class="flex justify-between items-center" style="margin-bottom: 24px;">
             <h3 style="margin: 0; font-size: 1.1rem;">Upcoming Events</h3>
             <button class="btn btn-text" onclick="window.location.hash='#/calendar'" style="font-size: 0.8rem;">View Calendar →</button>
         </div>
