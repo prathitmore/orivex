@@ -229,10 +229,10 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
             <h3>${monthNames[month]} ${year}</h3>
             <button id="next-month" class="btn btn-secondary">&gt;</button>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 0.8rem; margin-bottom: 8px; color: var(--color-text-muted);">
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 0.7rem; margin-bottom: 8px; color: var(--color-text-muted);">
             <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
         </div>
-        <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--spacing-sm);"></div>
+        <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
     `;
 
     container.querySelector('#prev-month').onclick = () => onNav(-1);
@@ -251,96 +251,53 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
     for (let i = 1; i <= daysInMonth; i++) {
         const dayBtn = document.createElement('button');
         dayBtn.className = 'card';
-        dayBtn.style.padding = '8px';
-        dayBtn.style.minHeight = '60px';
+        dayBtn.style.padding = '4px'; // Reduced padding
+        dayBtn.style.height = '50px'; // Fixed height, reduced
+        dayBtn.style.minHeight = 'auto';
         dayBtn.style.display = 'flex';
         dayBtn.style.flexDirection = 'column';
-        dayBtn.style.alignItems = 'flex-start';
+        dayBtn.style.alignItems = 'center'; // Center alignment for compactness
         dayBtn.style.justifyContent = 'flex-start';
-        dayBtn.style.textAlign = 'left';
+        dayBtn.style.textAlign = 'center';
         dayBtn.style.cursor = 'pointer';
-        dayBtn.style.transition = 'transform 0.1s';
-        dayBtn.style.position = 'relative'; // Ensure absolute children position correctly
-
-        // Remove scale effect if it's annoying, but user asked for "static".
-        // Maybe they meant the MOON PHASE shouldn't fade in/out.
-        // I will keep the scale effect on the card itself as requested previously for dashboard, but unrelated here?
-        // Actually earlier code had:
-        // dayBtn.onmouseover = () => dayBtn.style.transform = 'scale(1.02)';
-        // dayBtn.onmouseout = () => dayBtn.style.transform = 'scale(1)';
-
-        // Remove these if they interfere with "static" perception, but "static" likely refers to visibility.
+        dayBtn.style.position = 'relative';
 
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
 
         // Check for events on this day
         const dayEvents = events.filter(e => e.date === dateStr);
 
-        dayBtn.innerHTML = `<span style="font-weight: bold; font-size: 0.9rem; color: var(--color-text-primary); margin-bottom: 4px;">${i}</span>`;
+        dayBtn.innerHTML = `<span style="font-weight: bold; font-size: 0.8rem; color: var(--color-text-primary); margin-bottom: 2px;">${i}</span>`;
 
         // --- MOON PHASE LOGIC ---
-        // Calculate for this specific date
         const currentDayDate = new Date(date.getFullYear(), date.getMonth(), i);
         const moon = getMoonPhase(currentDayDate);
 
         if (dayEvents.length > 0) {
-            dayEvents.forEach(evt => {
-                const eventDate = new Date(evt.date);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const isPast = eventDate < today;
+            // Event Dot(s)
+            const dot = document.createElement('div');
+            dot.style.width = '6px';
+            dot.style.height = '6px';
+            dot.style.borderRadius = '50%';
+            dot.style.background = 'var(--color-accent)';
+            dot.style.marginTop = '2px';
+            dayBtn.appendChild(dot);
 
-                const dot = document.createElement('div');
-                dot.style.fontSize = '0.65rem';
-                dot.style.marginTop = '4px';
-                dot.style.padding = '2px 4px';
-                dot.style.borderRadius = '4px';
-                dot.style.width = '100%';
-                dot.style.whiteSpace = 'nowrap';
-                dot.style.overflow = 'hidden';
-                dot.style.textOverflow = 'ellipsis';
-
-                // Revert to just title
-                dot.textContent = evt.title;
-
-                if (isPast) {
-                    dot.style.background = 'rgba(255, 255, 255, 0.1)';
-                    dot.style.color = 'var(--color-text-muted)';
-                } else {
-                    dot.style.background = 'rgba(52, 152, 219, 0.2)';
-                    dot.style.color = '#3498db';
-                }
-
-                // Click specific event
-                dot.onclick = (e) => {
-                    e.stopPropagation();
-                    onDayClick(dateStr, evt.id);
-                };
-
-                dayBtn.appendChild(dot);
-            });
-            dayBtn.style.borderColor = 'var(--color-status-info)';
+            dayBtn.style.borderColor = 'var(--color-accent)';
         } else {
-            // Show Centered Moon Phase if no events
+            // MOON PHASE (Simplified for mobile)
             const moonDiv = document.createElement('div');
-            moonDiv.className = 'moon-phase';
-            moonDiv.style.position = 'absolute';
-            moonDiv.style.top = '50%';
-            moonDiv.style.left = '50%';
-            moonDiv.style.transform = 'translate(-50%, -50%)';
+            moonDiv.style.marginTop = '2px';
             moonDiv.style.textAlign = 'center';
-            moonDiv.style.width = '100%';
-            moonDiv.style.fontSize = '0.8rem';
-            moonDiv.style.color = 'var(--color-text-secondary)'; // More visible
-            moonDiv.style.pointerEvents = 'none'; // Click through to day
+            moonDiv.style.lineHeight = '1';
 
             moonDiv.innerHTML = `
-                <div style="font-size: 1.2rem; margin-bottom: 2px;">${moon.icon}</div>
-                <div style="font-size: 0.7rem; opacity: 0.8;">${moon.illumination}%</div>
+                <div style="font-size: 1rem;">${moon.icon}</div>
+                <div style="font-size: 0.6rem; color: var(--color-text-muted);">${moon.illumination}%</div>
             `;
-            moonDiv.title = `${moon.name} (${moon.illumination}%)`;
             dayBtn.appendChild(moonDiv);
         }
+
 
         dayBtn.onclick = () => onDayClick(dateStr);
 
