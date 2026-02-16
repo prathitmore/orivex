@@ -46,6 +46,21 @@ export function CosmicBackground() {
         return new THREE.CanvasTexture(canvas);
     };
 
+    const createStarTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 64, 64);
+        return new THREE.CanvasTexture(canvas);
+    };
+
     const setup = () => {
         const THREE = window.THREE;
         scene = new THREE.Scene();
@@ -80,11 +95,14 @@ export function CosmicBackground() {
         starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
         const starMaterial = new THREE.PointsMaterial({
-            size: 1.5,
+            size: 4, // Larger size to show circular glow
+            map: createStarTexture(),
             vertexColors: true,
             transparent: true,
-            opacity: 0.8,
-            sizeAttenuation: true
+            opacity: 1,
+            sizeAttenuation: true,
+            alphaTest: 0.1, // Clipping
+            blending: THREE.AdditiveBlending
         });
 
         stars = new THREE.Points(starGeo, starMaterial);
