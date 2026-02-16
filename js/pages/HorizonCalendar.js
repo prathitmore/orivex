@@ -11,111 +11,6 @@ export async function HorizonCalendarPage() {
         <h2 style="margin-bottom: var(--spacing-lg);">Horizon Calendar</h2>
     `;
 
-    // Inject Styles for Responsive Calendar
-    const style = document.createElement('style');
-    style.textContent = `
-        .calendar-wrapper {
-            width: 100%;
-            margin: 0 auto;
-        }
-        .calendar-weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            text-align: center;
-            font-size: 0.75rem;
-            margin-bottom: 8px;
-            color: var(--color-text-muted);
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
-        .calendar-day {
-            background: var(--color-bg-secondary);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid transparent; /* transparent border by default */
-            transition: all 0.2s ease;
-        }
-        .calendar-day:hover {
-            transform: translateY(-2px);
-            background: var(--color-bg-tertiary);
-            border-color: rgba(255,255,255,0.1);
-        }
-        
-        /* Mobile Styles (Default) */
-        .calendar-day {
-            height: 60px; /* Slightly taller than 50px for better aesthetic */
-            padding: 4px;
-            align-items: center;
-            justify-content: flex-start;
-        }
-        .day-number {
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 2px;
-            color: var(--color-text-primary);
-        }
-        .moon-phaser {
-            margin-top: auto;
-            text-align: center;
-            line-height: 1;
-        }
-        .moon-icon {
-            font-size: 1rem;
-        }
-        .moon-text {
-            font-size: 0.6rem;
-            color: var(--color-text-muted);
-            display: none; /* Hide text on very small screens if needed, or keep */
-        }
-
-        /* Desktop Styles */
-        @media (min-width: 768px) {
-            .calendar-wrapper {
-                max-width: 900px;
-                padding: 0 20px;
-            }
-            .calendar-grid {
-                gap: 12px;
-            }
-            .calendar-day {
-                height: 120px;
-                padding: 10px;
-                align-items: flex-start;
-            }
-            .day-number {
-                font-size: 1.1rem;
-                margin-bottom: 8px;
-            }
-            .moon-phaser {
-                width: 100%;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                position: absolute;
-                bottom: 8px;
-                left: 0;
-                padding: 0 10px;
-            }
-            .moon-icon {
-                font-size: 1.5rem;
-            }
-            .moon-text {
-                font-size: 0.75rem;
-                display: block;
-            }
-        }
-    `;
-    container.appendChild(style);
-
     const calendarEl = document.createElement('div');
     container.appendChild(calendarEl);
 
@@ -133,6 +28,7 @@ export async function HorizonCalendarPage() {
         const evtIdParam = params.get('eventId');
         if (dateParam) {
             selectedDate = dateParam;
+            // Also update current date to that month so if they go back, they see that month
             currentDate = new Date(dateParam);
         }
         if (evtIdParam) {
@@ -152,16 +48,11 @@ export async function HorizonCalendarPage() {
         renderApp();
 
         function renderApp() {
-            // Re-inject title and clear content but keep style
-            // Actually, better to just clear calendarEl
-            calendarEl.innerHTML = '';
-
-            // We need to ensure container still has the style and title if we wiped it? 
-            // The logic below recreates structure inside `calendarEl` or `container`. 
-            // Let's stick to the previous pattern: renderApp clears and rebuilds mainly the content part.
-
+            container.innerHTML = `
+                 <h2 style="margin-bottom: var(--spacing-lg);">Horizon Calendar</h2>
+            `;
             const content = document.createElement('div');
-            calendarEl.appendChild(content);
+            container.appendChild(content);
 
             if (selectedDate) {
                 renderDayView(content);
@@ -187,6 +78,7 @@ export async function HorizonCalendarPage() {
             // Filter if specific event selected via pill click
             if (selectedEventId) {
                 const specificEvent = dayEvents.filter(e => String(e.id) === String(selectedEventId));
+                // Only apply filter if we found the event (prevents blank screen on bad ID)
                 if (specificEvent.length > 0) {
                     dayEvents = specificEvent;
                 }
@@ -214,25 +106,36 @@ export async function HorizonCalendarPage() {
             }
 
             dayEvents.forEach(evt => {
+                // Check visibility
                 const isAssigned = evt.assigned.includes(currentUser.id);
                 const canView = currentUser.roles.includes('manager') || isAssigned;
 
                 if (!canView) return;
 
                 const eventCard = document.createElement('div');
-                eventCard.className = 'card interactive';
+                eventCard.className = 'card interactive'; // interactive for hover
                 eventCard.style.borderLeft = '4px solid var(--color-accent)';
                 eventCard.style.cursor = 'pointer';
 
+                // Map assigned IDs to Names
                 const assignedNames = evt.assigned.map(uid => {
                     const u = allUsers.find(user => user.id === uid);
                     return u ? u.name : 'Unknown';
                 }).join(', ');
 
+                // Check expansion state
                 let isExpanded = (selectedEventId === evt.id);
+                // If no specific event selected, maybe expand all? Or collapse all? Let's collapse all by default unless one targeted.
 
+                // Helper to render content
                 const renderContent = async () => {
+                    // Check moon phase for this event
                     const moon = getMoonPhase(new Date(evt.date));
+
+                    const eventDate = new Date(evt.date);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const isPast = eventDate < today;
 
                     eventCard.innerHTML = `
                         <div class="flex justify-between items-start">
@@ -261,12 +164,15 @@ export async function HorizonCalendarPage() {
                                             <button class="btn btn-secondary-danger delete-evt-btn">Cancel Event</button>
                                         </div>
                                     ` : ''}
+
+
                                 </div>
                             </div>
                             <div style="margin-left: 12px; color: var(--color-text-muted); transform: rotate(${isExpanded ? '180deg' : '0deg'}); transition: transform 0.2s;">▼</div>
                         </div>
                     `;
 
+                    // Re-attach delete listener if rendered
                     if (isExpanded && currentUser.roles.includes('manager')) {
                         const delBtn = eventCard.querySelector('.delete-evt-btn');
                         if (delBtn) {
@@ -277,7 +183,7 @@ export async function HorizonCalendarPage() {
                                     const idx = events.findIndex(e => e.id === evt.id);
                                     if (idx > -1) events.splice(idx, 1);
                                     if (selectedEventId === evt.id) selectedEventId = null;
-                                    renderApp();
+                                    renderApp(); // Refresh
                                 }
                             };
                         }
@@ -289,8 +195,11 @@ export async function HorizonCalendarPage() {
                 eventCard.onclick = () => {
                     isExpanded = !isExpanded;
                     renderContent();
+                    // If expanding, maybe close others?
+                    // Optional: close others logic here if we had access to other cards, 
+                    // but simple toggle is often better for comparison.
                     if (isExpanded) {
-                        selectedEventId = evt.id;
+                        selectedEventId = evt.id; // update state
                     } else {
                         if (selectedEventId === evt.id) selectedEventId = null;
                     }
@@ -314,19 +223,15 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     container.innerHTML = `
-        <div class="calendar-wrapper">
-            <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-md);">
-                <button id="prev-month" class="btn btn-secondary">&lt;</button>
-                <h3>${monthNames[month]} ${year}</h3>
-                <button id="next-month" class="btn btn-secondary">&gt;</button>
-            </div>
-            
-            <div class="calendar-weekdays">
-                <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
-            </div>
-            
-            <div id="days-grid" class="calendar-grid"></div>
+        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-md);">
+            <button id="prev-month" class="btn btn-secondary">&lt;</button>
+            <h3>${monthNames[month]} ${year}</h3>
+            <button id="next-month" class="btn btn-secondary">&gt;</button>
         </div>
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 0.7rem; margin-bottom: 8px; color: var(--color-text-muted);">
+            <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+        </div>
+        <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
     `;
 
     container.querySelector('#prev-month').onclick = () => onNav(-1);
@@ -338,68 +243,120 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
 
     // Empty slots
     for (let i = 0; i < firstDay; i++) {
-        const empty = document.createElement('div');
-        empty.style.background = 'transparent';
-        daysGrid.appendChild(empty);
+        daysGrid.appendChild(document.createElement('div'));
     }
 
     // Days
     for (let i = 1; i <= daysInMonth; i++) {
-        const dayBtn = document.createElement('div');
-        dayBtn.className = 'calendar-day';
+        const dayBtn = document.createElement('button');
+        dayBtn.className = 'card';
+        dayBtn.style.padding = '4px'; // Reduced padding
+        dayBtn.style.height = '50px'; // Fixed height, reduced
+        dayBtn.style.minHeight = 'auto';
+        dayBtn.style.display = 'flex';
+        dayBtn.style.flexDirection = 'column';
+        dayBtn.style.alignItems = 'center'; // Center alignment for compactness
+        dayBtn.style.justifyContent = 'flex-start';
+        dayBtn.style.textAlign = 'center';
+        dayBtn.style.cursor = 'pointer';
+        dayBtn.style.position = 'relative';
 
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+        // Check for events on this day
         const dayEvents = events.filter(e => e.date === dateStr);
+
+        dayBtn.innerHTML = `<span style="font-weight: bold; font-size: 0.8rem; color: var(--color-text-primary); margin-bottom: 2px;">${i}</span>`;
+
+        // --- MOON PHASE LOGIC ---
         const currentDayDate = new Date(date.getFullYear(), date.getMonth(), i);
         const moon = getMoonPhase(currentDayDate);
 
-        let contentHTML = `<div class="day-number">${i}</div>`;
-
         if (dayEvents.length > 0) {
-            // Event Indicator
-            const dot = `<div style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); margin-top: 4px; box-shadow: 0 0 4px var(--color-accent);"></div>`;
-            contentHTML += dot;
-            dayBtn.style.border = '1px solid var(--color-accent)';
+            // Event Dot(s)
+            const dot = document.createElement('div');
+            dot.style.width = '6px';
+            dot.style.height = '6px';
+            dot.style.borderRadius = '50%';
+            dot.style.background = 'var(--color-accent)';
+            dot.style.marginTop = '2px';
+            dayBtn.appendChild(dot);
+
+            dayBtn.style.borderColor = 'var(--color-accent)';
+        } else {
+            // MOON PHASE (Simplified for mobile)
+            const moonDiv = document.createElement('div');
+            moonDiv.style.marginTop = '2px';
+            moonDiv.style.textAlign = 'center';
+            moonDiv.style.lineHeight = '1';
+
+            moonDiv.innerHTML = `
+                <div style="font-size: 1rem;">${moon.icon}</div>
+                <div style="font-size: 0.6rem; color: var(--color-text-muted);">${moon.illumination}%</div>
+            `;
+            dayBtn.appendChild(moonDiv);
         }
 
-        // Moon Phase
-        contentHTML += `
-            <div class="moon-phaser">
-                 <div class="moon-icon">${moon.icon}</div>
-                 <div class="moon-text">${moon.illumination}%</div>
-            </div>
-        `;
 
-        dayBtn.innerHTML = contentHTML;
         dayBtn.onclick = () => onDayClick(dateStr);
+
         daysGrid.appendChild(dayBtn);
     }
 }
 
 export function getMoonPhase(inputDate) {
+    // Clone and set time to 20:00 (8 PM) for "Stargazing" context
     const date = new Date(inputDate);
     date.setHours(20, 0, 0, 0);
 
     const rad = Math.PI / 180;
+
+    // Days since J2000
+    // J2000 = 2451545.0
+    // Unix Epoch = 2440587.5
+    // Diff = 10957.5 days
     const t = (date.getTime() / 86400000) - 10957.5;
 
+    // Geocentric coordinates of the Moon (Simplified)
+    // Mean Longitude (L)
     const L = (218.316 + 13.176396 * t) * rad;
+    // Mean Anomaly (M)
     const M = (134.963 + 13.064993 * t) * rad;
+    // Mean Distance (F)
     const F = (93.272 + 13.229350 * t) * rad;
 
+    // Ecliptic Longitude (l) with major perturbations
+    // +6.289 * sin(M) is the Equation of Center
     const l = L + rad * 6.289 * Math.sin(M);
+    // Ecliptic Latitude (b)
     const b = rad * 5.128 * Math.sin(F);
 
+    // Sun coordinates
+    // Mean Anomaly of Sun (M_sun)
     const M_sun = (357.529 + 0.98560028 * t) * rad;
+    // Ecliptic Longitude of Sun (lambda_sun)
+    // +1.915 * sin(M_sun) is Equation of Center for Sun
     const lambda_sun = (280.466 + 0.98564736 * t) * rad + rad * 1.915 * Math.sin(M_sun) + rad * 0.020 * Math.sin(2 * M_sun);
 
+    // Elongation (psi) - Angular distance between Moon and Sun
     const psi = Math.acos(Math.cos(b) * Math.cos(l - lambda_sun));
+
+    // Illumination fraction k
+    // k = (1 + cos(phase_angle)) / 2
+    // phase_angle is approximately 180 - psi
+    // So k approx (1 - cos(psi)) / 2
     const illumination = Math.round((1 - Math.cos(psi)) / 2 * 100);
 
+    // Determine Phase Index (Waxing vs Waning)
+    // Based on relative angle
     let angle = l - lambda_sun;
+    // Normalize to 0-2PI
     while (angle < 0) angle += 2 * Math.PI;
     while (angle > 2 * Math.PI) angle -= 2 * Math.PI;
 
+    // Map angle to 8 segments
+    // 0 = New, PI/4 = Waxing Crescent, etc.
+    // Round to nearest 45 degrees (PI/4)
     const index = Math.round(angle / (Math.PI / 4)) % 8;
 
     const icons = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
