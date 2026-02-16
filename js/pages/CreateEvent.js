@@ -80,12 +80,26 @@ export async function CreateEventPage() {
             if (astronomers.length === 0) {
                 listContainer.innerHTML = '<p style="color: var(--color-text-muted); font-size: 0.9rem;">No astronomers found.</p>';
             } else {
+                if (allAvailability.length === 0) {
+                    const warn = document.createElement('div');
+                    warn.style.color = 'var(--color-status-warning)';
+                    warn.style.fontSize = '0.8rem';
+                    warn.style.textAlign = 'center';
+                    warn.style.marginBottom = '8px';
+                    warn.innerText = "Warning: No availability data loaded.";
+                    listContainer.appendChild(warn);
+                }
+
                 astronomers.forEach(u => {
                     // Check availability for this date
                     let status = 'unknown';
                     if (selectedDate) {
-                        const entry = allAvailability.find(a => String(a.user_id) === String(u.id) && a.date === selectedDate);
-                        if (entry) status = entry.status;
+                        // Strict check
+                        const entry = allAvailability.find(a =>
+                            String(a.user_id) === String(u.id) &&
+                            String(a.date) === String(selectedDate)
+                        );
+                        if (entry) status = String(entry.status).toLowerCase();
                     }
 
                     let statusDot = `<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-muted); display:inline-block;"></span>`;
@@ -97,7 +111,7 @@ export async function CreateEventPage() {
                     } else if (status === 'maybe') {
                         statusDot = `<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-status-warning); display:inline-block;"></span>`;
                         statusLabel = `<span style="font-size: 0.75rem; color: var(--color-status-warning); margin-left: 4px;">Maybe</span>`;
-                    } else if (status === 'unavailable') {
+                    } else if (status === 'unavailable' || status === 'busy') {
                         statusDot = `<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-status-danger); display:inline-block;"></span>`;
                         statusLabel = `<span style="font-size: 0.75rem; color: var(--color-status-danger); margin-left: 4px;">Busy</span>`;
                     }

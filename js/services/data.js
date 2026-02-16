@@ -79,12 +79,12 @@ export const DataService = {
     // --- Events ---
 
     async getEvents() {
-        const res = await fetch(`${API_BASE}/events`);
+        const res = await fetch(`${API_BASE}/events?ts=${Date.now()}`);
         return await res.json();
     },
 
     async getAcceptedEvents(userId) {
-        const res = await fetch(`${API_BASE}/users/${userId}/accepted_events`);
+        const res = await fetch(`${API_BASE}/users/${userId}/accepted_events?ts=${Date.now()}`);
         return await res.json();
     },
 
@@ -112,12 +112,12 @@ export const DataService = {
     },
 
     async getRequestsForUser(userId) {
-        const res = await fetch(`${API_BASE}/requests/${userId}`);
+        const res = await fetch(`${API_BASE}/requests/${userId}?ts=${Date.now()}`);
         return await res.json();
     },
 
     async getRequestsForEvent(eventId) {
-        const res = await fetch(`${API_BASE}/requests/event/${eventId}`);
+        const res = await fetch(`${API_BASE}/requests/event/${eventId}?ts=${Date.now()}`);
         return await res.json();
     },
 
@@ -132,15 +132,16 @@ export const DataService = {
     // --- Availability ---
 
     async getAvailabilityMap(userId) {
-        const res = await fetch(`${API_BASE}/availability/${userId}`);
+        const res = await fetch(`${API_BASE}/availability/${userId}?ts=${Date.now()}`);
         return await res.json();
     },
 
     async getAllAvailability() {
         // Return array of { user_id, date, status }
-        const res = await fetch(`${API_BASE}/availability/all`);
+        const res = await fetch(`${API_BASE}/availability/all?ts=${Date.now()}`);
         return await res.json();
     },
+
 
     async setAvailability(userId, date, status) {
         await fetch(`${API_BASE}/availability`, {

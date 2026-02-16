@@ -13,16 +13,18 @@ export async function RequestsPage() {
 
     try {
         const requests = await DataService.getRequestsForUser(user.id);
+        const pending = requests.filter(req => req.status === 'pending');
 
-        if (requests.length === 0) {
+        if (pending.length === 0) {
             container.innerHTML += `<p class="text-center" style="margin-top: var(--spacing-xl);">No pending requests.</p>`;
         } else {
-            requests.forEach(req => {
+            pending.forEach(req => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.style.marginBottom = 'var(--spacing-md)';
 
                 card.innerHTML = `
+
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-sm);">
                         <div>
                             <h3 style="font-size: 1.1rem; margin-bottom: 4px;">${req.title}</h3>
