@@ -92,7 +92,7 @@ export async function ProfilePage() {
         <!-- Settings List -->
         <div class="flex flex-col" style="gap: var(--spacing-md);">
             ${user.roles.length > 1 ? `
-                <button class="card btn w-full" style="justify-content: space-between;" onclick="window.location.hash='#/role-select'">
+                <button class="card btn w-full" style="justify-content: space-between; color: var(--color-text-primary);" onclick="window.location.hash='#/role-select'">
                     <span>Switch Role</span><span>⟳</span>
                 </button>
             ` : ''}
