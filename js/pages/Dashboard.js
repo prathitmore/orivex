@@ -20,15 +20,15 @@ export async function DashboardPage() {
     // 1. Welcome Header
     const welcome = document.createElement('div');
     welcome.className = 'flex items-center justify-between';
-    welcome.style.marginBottom = 'var(--spacing-lg)';
+    welcome.style.marginBottom = 'var(--spacing-md)'; // Reduced from lg
     welcome.innerHTML = `
-        <div class="flex items-center" style="gap: 16px;">
-             <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+        <div class="flex items-center" style="gap: 12px;"> // Reduced gap
+             <div style="width: 42px; height: 42px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
                 ${user.name.charAt(0)}
             </div>
             <div>
-                 <h1 style="font-size: 1.75rem; margin: 0; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Hello, ${user.name.split(' ')[0]}</h1>
-                 <p style="margin:4px 0 0 0; font-size: 0.95rem; color: var(--color-accent); text-transform: capitalize; font-weight: 500;">${user.currentRole}</p>
+                 <h1 style="font-size: 1.25rem; margin: 0; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Hello, ${user.name.split(' ')[0]}</h1>
+                 <p style="margin:2px 0 0 0; font-size: 0.8rem; color: var(--color-accent); text-transform: capitalize; font-weight: 500;">${user.currentRole}</p>
             </div>
         </div>
     `;
@@ -37,9 +37,9 @@ export async function DashboardPage() {
     // 2. Main Grid (Moon + Forecast + Stats)
     const topGrid = document.createElement('div');
     topGrid.style.display = 'grid';
-    topGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
-    topGrid.style.gap = 'var(--spacing-lg)';
-    topGrid.style.marginBottom = 'var(--spacing-xl)';
+    topGrid.style.gridTemplateColumns = '1fr'; // Single column on strict mobile default, auto-fit usually works but 1fr ensures full width usage
+    topGrid.style.gap = 'var(--spacing-md)'; // Reduced gap
+    topGrid.style.marginBottom = 'var(--spacing-lg)'; // Reduced from xl
 
     // Widget: Moon Phase / Weather
     const moonWidget = await createWeatherWidget();
@@ -83,7 +83,7 @@ async function createWeatherWidget() {
     card.className = 'card interactive weather-widget';
     card.style.background = 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%)';
     card.style.border = '1px solid rgba(255,255,255,0.08)';
-    // Removed gridColumn span to allow side-by-side layout
+    card.style.padding = '16px'; // Enforce comfortable padding
 
     // Get precise moon phase for today
     const currentPhase = getMoonPhase(new Date());
@@ -98,14 +98,14 @@ async function createWeatherWidget() {
     });
 
     card.innerHTML = `
-        <div class="flex justify-between items-start">
+        <div class="flex justify-between items-center">
              <div>
-                <h3 style="margin: 0; font-size: 1rem; color: var(--color-text-muted);">Moon Phase (India)</h3>
-                <div style="font-size: 1.5rem; font-weight: 600; margin-top: 8px; color: var(--color-text-primary);">${currentPhase.name}</div>
-                <div style="font-size: 0.9rem; color: var(--color-accent); margin-top: 4px;">Illumination: ${currentPhase.illumination}%</div>
-                <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px;">${indiaDate}</div>
+                <h3 style="margin: 0; font-size: 0.9rem; color: var(--color-text-muted);">Moon Phase (India)</h3>
+                <div style="font-size: 1.25rem; font-weight: 600; margin-top: 4px; color: var(--color-text-primary);">${currentPhase.name}</div>
+                <div style="font-size: 0.8rem; color: var(--color-accent); margin-top: 2px;">Illumination: ${currentPhase.illumination}%</div>
+                <div style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 2px;">${indiaDate}</div>
             </div>
-            <div style="font-size: 4rem; text-shadow: 0 0 20px rgba(255,255,255,0.2);">${currentPhase.icon}</div>
+            <div style="font-size: 3rem; text-shadow: 0 0 20px rgba(255,255,255,0.2); line-height: 1;">${currentPhase.icon}</div>
         </div>
     `;
     return card;
@@ -113,19 +113,19 @@ async function createWeatherWidget() {
 
 async function createUpcomingEventsWidget() {
     const section = document.createElement('div');
-    section.style.marginBottom = 'var(--spacing-xl)';
+    section.style.marginBottom = 'var(--spacing-lg)';
 
     section.innerHTML = `
-        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-md);">
-            <h3 style="margin: 0; font-size: 1.25rem;">Upcoming Events</h3>
-            <button class="btn btn-text" onclick="window.location.hash='#/calendar'" style="font-size: 0.9rem;">View Calendar →</button>
+        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-sm);">
+            <h3 style="margin: 0; font-size: 1.1rem;">Upcoming Events</h3>
+            <button class="btn btn-text" onclick="window.location.hash='#/calendar'" style="font-size: 0.8rem;">View Calendar →</button>
         </div>
     `;
 
     const grid = document.createElement('div');
     grid.style.display = 'grid';
-    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
-    grid.style.gap = 'var(--spacing-md)';
+    grid.style.gridTemplateColumns = '1fr'; // Force list view on mobile
+    grid.style.gap = 'var(--spacing-sm)'; // Reduced gap
 
     try {
         const user = AuthService.getCurrentUser();
@@ -145,17 +145,18 @@ async function createUpcomingEventsWidget() {
             .slice(0, 3); // Top 3
 
         if (upcoming.length === 0) {
-            grid.innerHTML = `<div class="card" style="grid-column: 1 / -1; color: var(--color-text-muted);">No upcoming events scheduled.</div>`;
+            grid.innerHTML = `<div class="card" style="grid-column: 1 / -1; color: var(--color-text-muted); font-size: 0.9rem; padding: 12px;">No upcoming events scheduled.</div>`;
         } else {
             for (const evt of upcoming) {
                 const card = document.createElement('div');
                 card.className = 'card interactive';
                 card.style.position = 'relative';
+                card.style.padding = '12px 16px'; // slightly tighter padding
 
                 // Add hover expansion effect
                 card.style.transition = 'transform 0.2s ease';
-                card.onmouseover = () => { card.style.transform = 'scale(1.02)'; card.style.zIndex = '10'; };
-                card.onmouseout = () => { card.style.transform = 'scale(1)'; card.style.zIndex = '1'; };
+                card.onmouseover = () => { card.style.transform = 'scale(1.01)'; };
+                card.onmouseout = () => { card.style.transform = 'scale(1)'; };
 
                 card.onclick = (e) => {
                     // Navigate to Calendar Day View for this specific event
@@ -167,27 +168,14 @@ async function createUpcomingEventsWidget() {
                 const dateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
                 card.innerHTML = `
-                    <div class="flex justify-between items-stretch">
-                        <div style="flex: 1; padding-right: 12px;">
-                            <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 8px; color: var(--color-primary);">${evt.title}</div>
-                            <div style="font-size: 0.9rem; margin-bottom: 4px;">📅 ${dateStr} • ${evt.time}</div>
-                            <div style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 0;">📍 ${evt.location.split(',')[0]}</div>
+                    <div class="flex justify-between items-center">
+                        <div style="flex: 1; padding-right: 8px;">
+                            <div style="font-weight: 600; font-size: 1rem; margin-bottom: 4px; color: var(--color-primary);">${evt.title}</div>
+                            <div style="font-size: 0.85rem; margin-bottom: 2px;">📅 ${dateStr} • ${evt.time}</div>
+                            <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 0;">📍 ${evt.location.split(',')[0]}</div>
                         </div>
-                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 90px; text-align: center; margin-top: 0; padding: 8px; height: auto; align-self: stretch;">
-                            <div style="font-size: 0.8rem;">Loading...</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Expanded Details -->
-                    <div class="event-details" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05);">
-                        <div style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 8px;">
-                            <strong>Full Location:</strong><br>${evt.location}
-                        </div>
-                        <div style="font-size: 0.9rem; color: var(--color-text-secondary);">
-                            <strong>Team:</strong> ${evt.assigned ? evt.assigned.length : 0} Astronomers assigned
-                        </div>
-                         <div style="margin-top: 12px; text-align: right;">
-                            <button class="btn btn-sm btn-secondary" onclick="window.location.hash='#/calendar'; event.stopPropagation();">View in Calendar</button>
+                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; text-align: center; padding: 4px; height: auto;">
+                            <div style="font-size: 0.7rem;">Loading...</div>
                         </div>
                     </div>
                 `;

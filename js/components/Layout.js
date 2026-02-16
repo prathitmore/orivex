@@ -9,7 +9,7 @@ export function Layout(content) {
     // Header
     const header = document.createElement('header');
     header.className = 'app-header';
-    header.style.padding = 'var(--spacing-md) var(--spacing-lg)';
+    header.style.padding = 'var(--spacing-sm) var(--spacing-md)'; // Reduced padding
     header.style.display = 'flex';
     header.style.justifyContent = 'space-between';
     header.style.alignItems = 'center';
@@ -20,11 +20,7 @@ export function Layout(content) {
     header.style.zIndex = '100';
 
     header.innerHTML = `
-
-
-        <img src="assets/orivex_logo.png" alt="Orivex" style="height: 50px;">
-
-
+        <img src="assets/orivex_logo.png" alt="Orivex" style="height: 32px;"> <!-- Reduced from 50px -->
         <div id="user-avatar" style="width: 32px; height: 32px; background: var(--color-bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;">
             <!-- Avatar initial -->
         </div>
@@ -34,7 +30,7 @@ export function Layout(content) {
     const main = document.createElement('main');
     main.className = 'app-content';
     main.style.flex = '1';
-    main.style.padding = 'var(--spacing-lg)';
+    main.style.padding = 'var(--spacing-md)'; // Reduced from lg
     main.style.maxWidth = '100%';
     main.style.overflowY = 'auto'; // scrollable content
     main.style.marginBottom = '60px'; // Space for bottom nav
@@ -57,7 +53,7 @@ export function Layout(content) {
     nav.style.borderTop = '1px solid rgba(255,255,255,0.05)';
     nav.style.display = 'flex';
     nav.style.justifyContent = 'space-around';
-    nav.style.padding = 'var(--spacing-md) 0';
+    nav.style.padding = '8px 0'; // Reduced vertical padding
     nav.style.zIndex = '100';
 
     // Determine Nav Items based on Role
@@ -74,7 +70,7 @@ export function Layout(content) {
             { icon: '🏠', label: 'Home', path: '#/dashboard' },
             { icon: '🌍', label: 'Horizon', path: '#/calendar' },
             { icon: '🗓️', label: 'Events', path: '#/events' },
-            { icon: '💰', label: 'Payments', path: '#/expenses' },
+            { icon: '💰', label: 'Pay', path: '#/expenses' }, // Shortened label
             { icon: '👥', label: 'Team', path: '#/astronomers' },
             { icon: '👤', label: 'Profile', path: '#/profile' }
         ];
@@ -82,9 +78,9 @@ export function Layout(content) {
         navItems = [
             { icon: '🏠', label: 'Home', path: '#/dashboard' },
             { icon: '🌍', label: 'Horizon', path: '#/calendar' },
-            { icon: '💰', label: 'Payments', path: '#/expenses' },
-            { icon: '⏰', label: 'My Avail', path: '#/availability' },
-            { icon: '📩', label: 'Requests', path: '#/requests' },
+            { icon: '💰', label: 'Pay', path: '#/expenses' }, // Shortened label
+            { icon: '⏰', label: 'Avail', path: '#/availability' }, // Shortened label
+            { icon: '📩', label: 'Reqs', path: '#/requests' }, // Shortened label
             { icon: '👤', label: 'Profile', path: '#/profile' }
         ];
     }
@@ -96,9 +92,10 @@ export function Layout(content) {
         link.style.flexDirection = 'column';
         link.style.alignItems = 'center';
         link.style.color = 'var(--color-text-secondary)';
-        link.style.fontSize = '12px';
-        link.style.gap = '4px';
+        link.style.fontSize = '10px'; // Reduced font size
+        link.style.gap = '2px';
         link.style.textDecoration = 'none';
+        link.style.minWidth = '40px'; // ensure touch target
 
         // Highlight active link
         if (window.location.hash.startsWith(item.path)) {
@@ -106,7 +103,7 @@ export function Layout(content) {
         }
 
         link.innerHTML = `
-            <span style="font-size: 20px;">${item.icon}</span>
+            <span style="font-size: 18px;">${item.icon}</span> <!-- Reduced icon size -->
             <span>${item.label}</span>
         `;
         nav.appendChild(link);
