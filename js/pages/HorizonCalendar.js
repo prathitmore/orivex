@@ -228,10 +228,10 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
             <h3>${monthNames[month]} ${year}</h3>
             <button id="next-month" class="btn btn-secondary">&gt;</button>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 0.8rem; margin-bottom: 8px; color: var(--color-text-muted);">
-            <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; color: var(--color-text-muted);">
+            <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
         </div>
-        <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--spacing-sm);"></div>
+        <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;"></div>
     `;
 
     container.querySelector('#prev-month').onclick = () => onNav(-1);
@@ -250,8 +250,8 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
     for (let i = 1; i <= daysInMonth; i++) {
         const dayBtn = document.createElement('button');
         dayBtn.className = 'card';
-        dayBtn.style.padding = '8px';
-        dayBtn.style.minHeight = '60px'; // Minimum height
+        dayBtn.style.padding = '10px';
+        dayBtn.style.minHeight = '110px'; // Desktop size
         dayBtn.style.display = 'flex';
         dayBtn.style.flexDirection = 'column';
         dayBtn.style.alignItems = 'flex-start';
@@ -264,7 +264,7 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const dayEvents = events.filter(e => e.date === dateStr);
 
-        dayBtn.innerHTML = `<span style="font-weight: bold; font-size: 0.9rem; color: var(--color-text-primary); margin-bottom: 4px;">${i}</span>`;
+        dayBtn.innerHTML = `<span style="font-weight: bold; font-size: 1.1rem; color: var(--color-text-primary); margin-bottom: 8px;">${i}</span>`;
 
         // --- MOON PHASE LOGIC ---
         const currentDayDate = new Date(date.getFullYear(), date.getMonth(), i);
@@ -278,9 +278,9 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
                 const isPast = eventDate < today;
 
                 const eventPill = document.createElement('div');
-                eventPill.style.fontSize = '0.65rem';
+                eventPill.style.fontSize = '0.8rem'; // Larger text
                 eventPill.style.marginTop = '4px';
-                eventPill.style.padding = '2px 4px';
+                eventPill.style.padding = '3px 8px';
                 eventPill.style.borderRadius = '4px';
                 eventPill.style.width = '100%';
                 eventPill.style.whiteSpace = 'nowrap';
@@ -292,7 +292,7 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
                     eventPill.style.background = 'rgba(255, 255, 255, 0.1)';
                     eventPill.style.color = 'var(--color-text-muted)';
                 } else {
-                    eventPill.style.background = 'rgba(52, 152, 219, 0.2)'; // Blue-ish
+                    eventPill.style.background = 'rgba(52, 152, 219, 0.2)';
                     eventPill.style.color = '#3498db';
                 }
 
@@ -309,16 +309,15 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
             // Show Centered Moon Phase if no events
             const moonDiv = document.createElement('div');
             moonDiv.style.position = 'absolute';
-            moonDiv.style.top = '50%';
+            moonDiv.style.top = '55%';
             moonDiv.style.left = '50%';
             moonDiv.style.transform = 'translate(-50%, -50%)';
             moonDiv.style.textAlign = 'center';
             moonDiv.style.width = '100%';
 
-            // Reduced size for better fit
             moonDiv.innerHTML = `
-                <div style="font-size: 1.2rem; margin-bottom: 2px;">${moon.icon}</div>
-                <div style="font-size: 0.7rem; color: var(--color-text-secondary);">${moon.illumination}%</div>
+                <div style="font-size: 1.5rem; margin-bottom: 4px;">${moon.icon}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-secondary);">${moon.illumination}%</div>
             `;
             moonDiv.title = `${moon.name} (${moon.illumination}%)`;
             dayBtn.appendChild(moonDiv);
