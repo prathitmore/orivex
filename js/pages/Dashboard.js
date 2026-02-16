@@ -194,7 +194,7 @@ async function createUpcomingEventsWidget() {
                             <div style="font-size: 0.85rem; margin-bottom: 2px;">📅 ${dateStr} • ${evt.time}</div>
                             <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 0;">📍 ${evt.location.split(',')[0]}</div>
                         </div>
-                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 80px; text-align: center; padding: 4px; border-radius: 16px;">
+                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 80px; text-align: center; padding: 4px; border-radius: 16px; gap: 2px;">
                             <div style="font-size: 0.7rem;">Loading...</div>
                         </div>
                     </div>
@@ -305,9 +305,9 @@ async function fetchWeatherForEvent(event, badge) {
         }
 
         badge.innerHTML = `
-            <div style="font-size: 1.5rem; line-height: 1; margin-bottom: 2px;">☁️</div>
-            <div style="font-size: 0.9rem; font-weight: 700; line-height: 1.2;">${Math.round(cloudCover)}%</div>
-            <div style="font-size: 1rem; margin-top: 2px;">${emoji}</div>
+            <div style="font-size: 1.6rem; line-height: 1;">☁️</div>
+            <div style="font-size: 0.95rem; font-weight: 700; line-height: 1;">${Math.round(cloudCover)}%</div>
+            <div style="font-size: 1.2rem; line-height: 1;">${emoji}</div>
         `;
 
         // Update color
@@ -354,9 +354,9 @@ function createDailyQuote() {
     el.style.border = 'none';
     el.style.background = 'var(--color-bg-secondary)'; // darker
     el.innerHTML = `
-            < div style = "font-size: 1.1rem; font-style: italic; margin-bottom: 8px; font-family: 'Georgia', serif;" > "${quote.text}"</div >
-                <div style="font-size: 0.9rem; color: var(--color-accent);">— ${quote.author}</div>
-        `;
+        <div style="font-size: 1.1rem; font-style: italic; margin-bottom: 8px; font-family: 'Georgia', serif;">"${quote.text}"</div>
+        <div style="font-size: 0.9rem; color: var(--color-accent);">— ${quote.author}</div>
+    `;
     return el;
 }
 
@@ -380,14 +380,14 @@ async function createAstronomerStatusWidget(user) {
     if (todayStatus === 'unavailable') { statusText = 'Unavailable'; statusColor = 'var(--color-status-danger)'; }
 
     card.innerHTML = `
-            < h3 style = "margin:0 0 12px 0; font-size: 1rem; color: var(--color-text-muted);" > Today's Availability</h3>
-                < div class="flex justify-between items-center" >
+            <h3 style="margin:0 0 12px 0; font-size: 1rem; color: var(--color-text-muted);">Today's Availability</h3>
+                <div class="flex justify-between items-center">
             <div class="flex items-center" style="gap: 8px;">
                  <div style="width: 12px; height: 12px; border-radius: 50%; background: ${statusColor}; box-shadow: 0 0 8px ${statusColor};"></div>
                  <span style="font-weight: 600; font-size: 1.1rem;">${statusText}</span>
             </div>
             <button class="btn btn-sm btn-secondary" onclick="window.location.hash='#/availability'">Update</button>
-        </div >
+        </div>
             `;
     return card;
 }
@@ -407,15 +407,15 @@ async function createManagerStatsWidget() {
     } catch (e) { }
 
     card.innerHTML = `
-            < h3 style = "margin:0 0 12px 0; font-size: 1rem; color: var(--color-text-muted);" > Platform Overview</h3 >
-                <div class="flex justify-between items-end">
-                    <div>
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--color-primary); line-height: 1;">${pendingEvents}</div>
-                        <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 4px;">Total Scheduled Events</div>
-                    </div>
-                    <button class="btn btn-sm btn-primary" onclick="window.location.hash='#/create-event'">+ New Event</button>
-                </div>
-        `;
+        <h3 style="margin:0 0 12px 0; font-size: 1rem; color: var(--color-text-muted);">Platform Overview</h3>
+        <div class="flex justify-between items-end">
+            <div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--color-primary); line-height: 1;">${pendingEvents}</div>
+                <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 4px;">Total Scheduled Events</div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="window.location.hash='#/create-event'">+ New Event</button>
+        </div>
+    `;
     return card;
 }
 
@@ -430,8 +430,8 @@ async function createAstronomerNextRequestWidget(user) {
             card.className = 'card';
             card.style.borderLeft = '4px solid var(--color-accent)';
             card.innerHTML = `
-            < h3 style = "margin:0 0 12px 0; font-size: 1rem;" > Next Assignment Request</h3 >
-                 <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 4px;">${req.title}</div>
+                <h3 style="margin:0 0 12px 0; font-size: 1rem;">Next Assignment Request</h3>
+                <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 4px;">${req.title}</div>
                  <div style="color: var(--color-text-secondary); font-size: 0.9rem;">${req.date} • ${req.time}</div>
                  <div style="margin-top: 12px;">
                     <button class="btn btn-primary w-full" onclick="window.location.hash='#/requests'">Manage Requests</button>
