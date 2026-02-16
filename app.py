@@ -19,6 +19,7 @@ import traceback
 # --- Configuration ---
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
+# Triggering deployment for verification
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.url_map.strict_slashes = False
 CORS(app)
