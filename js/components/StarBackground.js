@@ -18,6 +18,8 @@ export function StarBackground() {
 
     let renderer, scene, camera, stars, starGeo, starMaterial;
     let animationId;
+    let mouseX = 0, mouseY = 0;
+    let targetX = 0, targetY = 0;
 
     // Load Three.js dynamically if not already present
     const init = () => {
@@ -41,33 +43,40 @@ export function StarBackground() {
 
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
         starGeo = new THREE.BufferGeometry();
-        const starCount = 6000;
+        const starCount = 8000; // More stars for better immersion
         const positions = new Float32Array(starCount * 3);
-        const velocities = new Float32Array(starCount);
 
         for (let i = 0; i < starCount; i++) {
-            positions[i * 3] = Math.random() * 600 - 300;     // x
-            positions[i * 3 + 1] = Math.random() * 600 - 300; // y
-            positions[i * 3 + 2] = Math.random() * 600 - 300; // z
-            velocities[i] = 0;
+            positions[i * 3] = Math.random() * 800 - 400;     // x
+            positions[i * 3 + 1] = Math.random() * 1000 - 500; // y (longer depth)
+            positions[i * 3 + 2] = Math.random() * 800 - 400; // z
         }
 
         starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
         starMaterial = new THREE.PointsMaterial({
-            color: 0xaaaaaa,
-            size: 0.7,
-            transparent: true
+            color: 0xffffff,
+            size: 0.8,
+            transparent: true,
+            opacity: 0.8
         });
 
         stars = new THREE.Points(starGeo, starMaterial);
         scene.add(stars);
 
         window.addEventListener('resize', onWindowResize, false);
+        document.addEventListener('mousemove', onMouseMove, false);
         animate();
+    };
+
+    const onMouseMove = (event) => {
+        // Normalize mouse coordinates (-1 to +1)
+        mouseX = (event.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+        mouseY = (event.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
     };
 
     const onWindowResize = () => {
@@ -79,18 +88,29 @@ export function StarBackground() {
     const animate = () => {
         animationId = requestAnimationFrame(animate);
 
+        // Smootly interpolate target position (lerp)
+        targetX += (mouseX - targetX) * 0.05;
+        targetY += (mouseY - targetY) * 0.05;
+
+        // Apply parallax to the whole star system
+        stars.rotation.z = targetX * 0.1;
+        stars.rotation.y = targetX * 0.05;
+        stars.position.x = targetX * 20;
+        stars.position.z = targetY * 10;
+
         const positions = starGeo.attributes.position.array;
-        for (let i = 0; i < 6000; i++) {
-            // Speed up as they come closer
-            let velocity = (positions[i * 3 + 1] + 300) / 600 * 0.5 + 0.1;
+        for (let i = 0; i < 8000; i++) {
+            // Forward movement
+            let velocity = (positions[i * 3 + 1] + 500) / 1000 * 0.6 + 0.2;
             positions[i * 3 + 1] -= velocity;
 
-            if (positions[i * 3 + 1] < -300) {
-                positions[i * 3 + 1] = 300;
+            if (positions[i * 3 + 1] < -500) {
+                positions[i * 3 + 1] = 500;
+                positions[i * 3] = Math.random() * 800 - 400;
+                positions[i * 3 + 2] = Math.random() * 800 - 400;
             }
         }
         starGeo.attributes.position.needsUpdate = true;
-        stars.rotation.y += 0.002;
 
         renderer.render(scene, camera);
     };
@@ -99,6 +119,7 @@ export function StarBackground() {
     container.cleanup = () => {
         cancelAnimationFrame(animationId);
         window.removeEventListener('resize', onWindowResize);
+        document.removeEventListener('mousemove', onMouseMove);
         if (renderer) {
             renderer.dispose();
             if (renderer.domElement && renderer.domElement.parentNode) {

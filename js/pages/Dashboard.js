@@ -13,14 +13,16 @@ export async function DashboardPage() {
 
     const container = document.createElement('div');
 
-    // Mount Star Background
+    // Mount Star Background to body instead of container
+    // This bypasses the parent's transform (fade-in) which can break fixed positioning
     const stars = StarBackground();
-    container.appendChild(stars);
+    document.body.appendChild(stars);
 
     // IntersectionObserver to detect when the dashboard is removed from DOM to cleanup Three.js
     const observer = new MutationObserver((mutations) => {
         if (!document.body.contains(container)) {
             if (stars.cleanup) stars.cleanup();
+            if (stars.parentNode) stars.parentNode.removeChild(stars); // Remove from body
             observer.disconnect();
         }
     });
