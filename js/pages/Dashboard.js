@@ -22,7 +22,8 @@ export async function DashboardPage() {
     welcome.className = 'flex items-center justify-between';
     welcome.style.marginBottom = 'var(--spacing-md)'; // Reduced from lg
     welcome.innerHTML = `
-        <div class="flex items-center" style="gap: 12px;"> // Reduced gap
+        <div class="flex items-center" style="gap: 12px;">
+
              <div style="width: 42px; height: 42px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
                 ${user.name.charAt(0)}
             </div>
