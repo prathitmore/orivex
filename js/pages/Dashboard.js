@@ -1,6 +1,7 @@
 import { AuthService } from '../services/auth.js';
 import { DataService } from '../services/data.js';
 import { getMoonPhase } from './HorizonCalendar.js';
+import { StarBackground } from '../components/StarBackground.js';
 
 export async function DashboardPage() {
     let user = AuthService.getCurrentUser();
@@ -11,7 +12,23 @@ export async function DashboardPage() {
     if (freshUser) user = freshUser;
 
     const container = document.createElement('div');
+
+    // Mount Star Background
+    const stars = StarBackground();
+    container.appendChild(stars);
+
+    // IntersectionObserver to detect when the dashboard is removed from DOM to cleanup Three.js
+    const observer = new MutationObserver((mutations) => {
+        if (!document.body.contains(container)) {
+            if (stars.cleanup) stars.cleanup();
+            observer.disconnect();
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
     container.className = 'container fade-in';
+    container.style.position = 'relative'; // Ensure content sits on top of background
+    container.style.zIndex = '1';
     container.style.paddingBottom = '80px';
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
