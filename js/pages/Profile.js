@@ -169,7 +169,7 @@ export async function ProfilePage() {
                         <div style="font-size: 1.25rem; color: var(--color-status-danger);">⏻</div>
                         <div>
                             <div style="font-weight: 600; font-size: 0.95rem; color: var(--color-status-danger);">Terminate Session</div>
-                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Safely log out of Boltix</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Safely log out of Orivex</div>
                         </div>
                     </div>
                     <span style="opacity: 0.5; color: var(--color-status-danger);">➜</span>
