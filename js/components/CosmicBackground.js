@@ -25,16 +25,13 @@ export function CosmicBackground() {
         if (window.THREE) {
             setup();
         } else {
-            // Check to see if script is already added to avoid duplicates
+            // Fallback for extreme edge cases: listen for load on existing script or add it
             const existingScript = document.querySelector('script[src*="three.min.js"]');
             if (existingScript) {
-                // If script exists but window.THREE isn't ready, wait for load
                 existingScript.addEventListener('load', setup);
             } else {
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js';
-                script.onload = setup;
-                document.head.appendChild(script);
+                // If not found in DOM, log error (should be in index.html now)
+                console.error("Three.js not found. Ensure it is included in index.html");
             }
         }
     };
