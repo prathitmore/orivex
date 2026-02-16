@@ -17,7 +17,7 @@ export function LoginPage() {
 
 
 
-        <img src="assets/orivex_logo.png" alt="Orivex" style="width: 80%; max-width: 350px; height: auto; margin-bottom: var(--spacing-sm);">
+        <img src="assets/orivex_logo.png" alt="Boltix Solutions" style="width: 80%; max-width: 350px; height: auto; margin-bottom: var(--spacing-sm);">
 
 
 

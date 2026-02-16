@@ -251,8 +251,8 @@ def create_user():
     # Send Welcome Email
     try:
         login_url = request.url_root.rstrip('/')  # Dynamic URL based on current host
-        email_body = f"Welcome {data['name']}!\n\nYour Orivex account has been created.\nUsername: {username}\nPassword: {data['password']}\n\nLogin here: {login_url}"
-        send_email(username, "Your Orivex Account Credentials", email_body)
+        email_body = f"Welcome {data['name']}!\n\nYour Boltix account has been created.\nUsername: {username}\nPassword: {data['password']}\n\nLogin here: {login_url}"
+        send_email(username, "Your Boltix Account Credentials", email_body)
     except Exception as e:
         print(f"Failed to send welcome email: {e}")
 
@@ -633,7 +633,7 @@ def reset_password_request():
         
     db.session.commit()
     
-    success, msg = send_email(email, "Orivex OTP", f"Your OTP: {otp}")
+    success, msg = send_email(email, "Boltix OTP", f"Your OTP: {otp}")
     if success: return jsonify({"success": True})
     return jsonify({"success": False, "message": msg}), 500
 

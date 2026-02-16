@@ -19,7 +19,7 @@ export function CreateUserPage() {
 
             <div>
                 <label style="display: block; margin-bottom: var(--spacing-xs); color: var(--color-text-secondary); font-size: 0.9rem;">Email Address</label>
-                <input type="email" name="contact" class="input" placeholder="e.g. alex@orivex.com" required>
+                <input type="email" name="contact" class="input" placeholder="e.g. alex@boltix.com" required>
             </div>
 
             <div>

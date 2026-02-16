@@ -169,7 +169,7 @@ export async function ProfilePage() {
                         <div style="font-size: 1.25rem; color: var(--color-status-danger);">⏻</div>
                         <div>
                             <div style="font-weight: 600; font-size: 0.95rem; color: var(--color-status-danger);">Terminate Session</div>
-                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Safely log out of Orivex</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Safely log out of Boltix</div>
                         </div>
                     </div>
                     <span style="opacity: 0.5; color: var(--color-status-danger);">➜</span>
@@ -181,7 +181,7 @@ export async function ProfilePage() {
             <div style="font-family: monospace; font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 2px;">
                 Horizon Protocol V1.0.4
             </div>
-            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-top: 4px;">Secure connection via Orivex Systems</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-top: 4px;">Secure connection via Boltix Solutions</div>
         </div>
 
         <style>
