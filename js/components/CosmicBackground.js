@@ -81,7 +81,7 @@ export function CosmicBackground() {
 
         // 1. Starfield
         const starGeo = new THREE.BufferGeometry();
-        const starCount = 10000;
+        const starCount = 18000; // Increased fro 10000
         const starPos = new Float32Array(starCount * 3);
         const starColors = new Float32Array(starCount * 3);
 
@@ -117,7 +117,7 @@ export function CosmicBackground() {
 
         // 2. Nebula (Simplified Cloud Sprite System)
         const cloudTexture = createCloudTexture();
-        const nebulaCount = 50;
+        const nebulaCount = 60; // Increased from 50
         const nebulaGroup = new THREE.Group();
 
         for (let i = 0; i < nebulaCount; i++) {
@@ -142,6 +142,9 @@ export function CosmicBackground() {
 
         window.addEventListener('resize', onWindowResize);
         document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
+        document.addEventListener('touchstart', onTouchMove, { passive: false });
+
 
         // Force a resize/render shortly after setup to ensure correct dimensions
         setTimeout(() => {
@@ -154,6 +157,14 @@ export function CosmicBackground() {
     const onMouseMove = (e) => {
         mouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
         mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+    };
+
+    const onTouchMove = (e) => {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            mouseX = (touch.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+            mouseY = (touch.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+        }
     };
 
     const onWindowResize = () => {
@@ -195,6 +206,8 @@ export function CosmicBackground() {
         cancelAnimationFrame(animationId);
         window.removeEventListener('resize', onWindowResize);
         document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchstart', onTouchMove);
         if (renderer) {
             renderer.dispose();
             // Also dispose geometries/materials ideally
