@@ -40,7 +40,7 @@ export async function DashboardPage() {
     topGrid.style.display = 'grid';
     topGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(350px, 1fr))';
     topGrid.style.gap = 'var(--spacing-md)';
-    topGrid.style.marginBottom = 'var(--spacing-lg)';
+    topGrid.style.marginBottom = 'var(--spacing-xl)';
 
     // Widget: Moon Phase / Weather
     const moonWidget = await createWeatherWidget();
