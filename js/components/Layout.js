@@ -13,7 +13,8 @@ export function Layout(content) {
     header.style.display = 'flex';
     header.style.justifyContent = 'space-between';
     header.style.alignItems = 'center';
-    header.style.backgroundColor = 'var(--color-bg-primary)'; // Blend with body
+    header.style.backgroundColor = 'rgba(18, 18, 18, 0.6)'; // Semi-transparent
+    header.style.backdropFilter = 'blur(12px)';
     header.style.borderBottom = 'none'; // Remove divider
     header.style.position = 'sticky';
     header.style.top = '0';

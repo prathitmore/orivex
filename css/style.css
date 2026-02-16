@@ -4,6 +4,14 @@
     box-sizing: border-box;
 }
 
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    overflow-x: hidden;
+}
+
 h1,
 h2,
 h3,
