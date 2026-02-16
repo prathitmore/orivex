@@ -194,7 +194,7 @@ async function createUpcomingEventsWidget() {
                             <div style="font-size: 0.85rem; margin-bottom: 2px;">📅 ${dateStr} • ${evt.time}</div>
                             <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 0;">📍 ${evt.location.split(',')[0]}</div>
                         </div>
-                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 70px; height: 70px; text-align: center; padding: 4px; border-radius: 16px;">
+                        <div class="weather-badge" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 80px; text-align: center; padding: 4px; border-radius: 16px;">
                             <div style="font-size: 0.7rem;">Loading...</div>
                         </div>
                     </div>
