@@ -228,7 +228,7 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
             <h3>${monthNames[month]} ${year}</h3>
             <button id="next-month" class="btn btn-secondary">&gt;</button>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 0.7rem; margin-bottom: 8px; color: var(--color-text-muted);">
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 0.7rem; margin-bottom: 8px; color: var(--color-text-muted);">
             <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
         </div>
         <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
@@ -250,13 +250,13 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
     for (let i = 1; i <= daysInMonth; i++) {
         const dayBtn = document.createElement('button');
         dayBtn.className = 'card';
-        dayBtn.style.padding = '4px'; // Reduced padding
-        dayBtn.style.height = '50px'; // Fixed height, reduced
+        dayBtn.style.padding = '4px';
+        dayBtn.style.height = '60px'; // Slightly taller to fit content comfortably
         dayBtn.style.minHeight = 'auto';
         dayBtn.style.display = 'flex';
         dayBtn.style.flexDirection = 'column';
-        dayBtn.style.alignItems = 'center'; // Center alignment for compactness
-        dayBtn.style.justifyContent = 'flex-start';
+        dayBtn.style.alignItems = 'center';
+        dayBtn.style.justifyContent = 'space-between'; // Distribute space
         dayBtn.style.textAlign = 'center';
         dayBtn.style.cursor = 'pointer';
         dayBtn.style.position = 'relative';
@@ -266,38 +266,38 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
         // Check for events on this day
         const dayEvents = events.filter(e => e.date === dateStr);
 
-        dayBtn.innerHTML = `<span style="font-weight: bold; font-size: 0.8rem; color: var(--color-text-primary); margin-bottom: 2px;">${i}</span>`;
-
-        // --- MOON PHASE LOGIC ---
-        const currentDayDate = new Date(date.getFullYear(), date.getMonth(), i);
-        const moon = getMoonPhase(currentDayDate);
+        let content = `<span style="font-weight: bold; font-size: 0.8rem; color: var(--color-text-primary); margin-bottom: 2px;">${i}</span>`;
 
         if (dayEvents.length > 0) {
-            // Event Dot(s)
-            const dot = document.createElement('div');
-            dot.style.width = '6px';
-            dot.style.height = '6px';
-            dot.style.borderRadius = '50%';
-            dot.style.background = 'var(--color-accent)';
-            dot.style.marginTop = '2px';
-            dayBtn.appendChild(dot);
+            // Logic: Show Event Dots (hide Moon)
+            // Container for dots
+            let dotsHtml = `<div style="display: flex; gap: 3px; margin-bottom: 4px; flex-wrap: wrap; justify-content: center;">`;
+            // Limit dots to avoid overflow (e.g., max 4)
+            const displayCount = Math.min(dayEvents.length, 4);
+            for (let k = 0; k < displayCount; k++) {
+                dotsHtml += `<div style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent);"></div>`;
+            }
+            if (dayEvents.length > 4) {
+                dotsHtml += `<div style="width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-muted); align-self: center;"></div>`;
+            }
+            dotsHtml += `</div>`;
 
+            content += dotsHtml;
             dayBtn.style.borderColor = 'var(--color-accent)';
         } else {
-            // MOON PHASE (Simplified for mobile)
-            const moonDiv = document.createElement('div');
-            moonDiv.style.marginTop = '2px';
-            moonDiv.style.textAlign = 'center';
-            moonDiv.style.lineHeight = '1';
+            // Logic: Show Moon Phase (when no events)
+            const currentDayDate = new Date(date.getFullYear(), date.getMonth(), i);
+            const moon = getMoonPhase(currentDayDate);
 
-            moonDiv.innerHTML = `
-                <div style="font-size: 1rem;">${moon.icon}</div>
-                <div style="font-size: 0.6rem; color: var(--color-text-muted);">${moon.illumination}%</div>
+            content += `
+                <div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; line-height: 1;">
+                    <div style="font-size: 1rem;">${moon.icon}</div>
+                    <div style="font-size: 0.6rem; color: var(--color-text-muted); margin-top: 2px;">${moon.illumination}%</div>
+                </div>
             `;
-            dayBtn.appendChild(moonDiv);
         }
 
-
+        dayBtn.innerHTML = content;
         dayBtn.onclick = () => onDayClick(dateStr);
 
         daysGrid.appendChild(dayBtn);
