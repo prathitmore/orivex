@@ -19,15 +19,23 @@ export function CosmicBackground() {
     let animationId;
     let mouseX = 0, mouseY = 0;
     let targetX = 0, targetY = 0;
+    let isDestroyed = false;
 
     const init = () => {
         if (window.THREE) {
             setup();
         } else {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js';
-            script.onload = setup;
-            document.head.appendChild(script);
+            // Check to see if script is already added to avoid duplicates
+            const existingScript = document.querySelector('script[src*="three.min.js"]');
+            if (existingScript) {
+                // If script exists but window.THREE isn't ready, wait for load
+                existingScript.addEventListener('load', setup);
+            } else {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js';
+                script.onload = setup;
+                document.head.appendChild(script);
+            }
         }
     };
 
@@ -62,6 +70,8 @@ export function CosmicBackground() {
     };
 
     const setup = () => {
+        if (isDestroyed) return;
+
         const THREE = window.THREE;
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
@@ -135,6 +145,12 @@ export function CosmicBackground() {
 
         window.addEventListener('resize', onWindowResize);
         document.addEventListener('mousemove', onMouseMove);
+
+        // Force a resize/render shortly after setup to ensure correct dimensions
+        setTimeout(() => {
+            if (!isDestroyed) onWindowResize();
+        }, 100);
+
         animate();
     };
 
@@ -144,36 +160,48 @@ export function CosmicBackground() {
     };
 
     const onWindowResize = () => {
+        if (!camera || !renderer) return;
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
     const animate = () => {
+        if (isDestroyed) return;
         animationId = requestAnimationFrame(animate);
 
         targetX += (mouseX - targetX) * 0.03;
         targetY += (mouseY - targetY) * 0.03;
 
-        stars.rotation.y += 0.0002;
-        stars.rotation.x += 0.0001;
+        if (stars) {
+            stars.rotation.y += 0.0002;
+            stars.rotation.x += 0.0001;
 
-        // Parallax
-        stars.position.x = targetX * 50;
-        stars.position.y = -targetY * 50;
+            // Parallax
+            stars.position.x = targetX * 50;
+            stars.position.y = -targetY * 50;
+        }
 
-        nebula.rotation.z += 0.0005;
-        nebula.position.x = targetX * 30;
-        nebula.position.y = -targetY * 30;
+        if (nebula) {
+            nebula.rotation.z += 0.0005;
+            nebula.position.x = targetX * 30;
+            nebula.position.y = -targetY * 30;
+        }
 
-        renderer.render(scene, camera);
+        if (renderer && scene && camera) {
+            renderer.render(scene, camera);
+        }
     };
 
     container.cleanup = () => {
+        isDestroyed = true;
         cancelAnimationFrame(animationId);
         window.removeEventListener('resize', onWindowResize);
         document.removeEventListener('mousemove', onMouseMove);
-        if (renderer) renderer.dispose();
+        if (renderer) {
+            renderer.dispose();
+            // Also dispose geometries/materials ideally
+        }
     };
 
     init();
