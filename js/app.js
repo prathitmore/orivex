@@ -44,6 +44,7 @@ async function router() {
 
     // Auth Check (Simple)
     const publicPages = ['/', '/login'];
+    const noNavPages = ['/', '/login', '/role-select'];
     const user = sessionStorage.getItem('orivex_user');
 
     if (!user && !publicPages.includes(path)) {
@@ -63,7 +64,7 @@ async function router() {
             pageContent = result;
         }
 
-        if (publicPages.includes(path)) {
+        if (noNavPages.includes(path)) {
             app.innerHTML = '';
             app.appendChild(pageContent);
         } else {
