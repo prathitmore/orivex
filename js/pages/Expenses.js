@@ -11,13 +11,14 @@ export async function ExpensesPage() {
 
     container.innerHTML = `
         <div class="fade-in">
-            <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-lg);">
-                <h2>Payments</h2>
-                <div class="flex gap-2">
-                    <button id="add-group-expense-btn" class="btn btn-secondary" style="display: none;">+ Group Expense</button>
-                    <button id="add-expense-btn" class="btn btn-primary" style="display: none;">+ Add Expense</button>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Payments</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button id="add-group-expense-btn" class="btn btn-secondary" style="display: none; padding: 8px 12px; font-size: 0.9rem;">+ Group</button>
+                    <button id="add-expense-btn" class="btn btn-primary" style="display: none; padding: 8px 12px; font-size: 0.9rem;">+ Expense</button>
                 </div>
             </div>
+
             
             <div id="expense-list" class="flex flex-col" style="gap: var(--spacing-md);">
                 <div style="text-align:center; color: var(--color-text-muted);">Loading...</div>
