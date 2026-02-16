@@ -44,17 +44,32 @@ export async function RequestsPage() {
                     </div>
                 `;
 
-                card.querySelector('.btn-accept').onclick = async () => {
-                    await DataService.updateRequestStatus(req.id, 'accepted');
-                    alert('Event accepted!');
-                    window.location.reload();
+                const handleStatusUpdate = async (status) => {
+                    const btnWrap = card.querySelector('.flex');
+                    const originalHtml = btnWrap.innerHTML;
+                    btnWrap.innerHTML = `<div class="text-center w-full" style="font-size: 0.9rem; color: var(--color-accent);">Processing...</div>`;
+
+                    try {
+                        await DataService.updateRequestStatus(req.id, status);
+                        if (status === 'accepted') {
+                            alert('Event accepted!');
+                        }
+                        window.location.reload();
+                    } catch (e) {
+                        console.error(`Failed to ${status} request:`, e);
+                        alert(`Error: ${e.message}`);
+                        btnWrap.innerHTML = originalHtml;
+                        // Re-bind events since we overwrote innerHTML
+                        bindButtons();
+                    }
                 };
 
-                card.querySelector('.btn-decline').onclick = async () => {
-                    await DataService.updateRequestStatus(req.id, 'declined');
-                    window.location.reload();
+                const bindButtons = () => {
+                    card.querySelector('.btn-accept').onclick = () => handleStatusUpdate('accepted');
+                    card.querySelector('.btn-decline').onclick = () => handleStatusUpdate('declined');
                 };
 
+                bindButtons();
                 container.appendChild(card);
             });
         }

@@ -1,17 +1,23 @@
-
 const API_BASE = '/api';
 
 export const DataService = {
+    async handleResponse(res) {
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({ message: res.statusText }));
+            throw new Error(error.message || `API Error: ${res.status}`);
+        }
+        return res.json();
+    },
+
     async getUsers() {
-        // Add cache bust to prevent 404s from stale service worker/browser cache
         const res = await fetch(`${API_BASE}/users?ts=${Date.now()}`);
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async getUser(userId) {
-        const res = await fetch(`${API_BASE}/users/${userId}`);
+        const res = await fetch(`${API_BASE}/users/${userId}?ts=${Date.now()}`);
         if (!res.ok) return null;
-        return await res.json();
+        return res.json();
     },
 
     async createUser(userData) {
@@ -20,23 +26,24 @@ export const DataService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
         });
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async updateUserDetails(userId, data) {
         const res = await fetch(`${API_BASE}/users/${userId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data) // Can include name, base_location, password
+            body: JSON.stringify(data)
         });
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async getUserStats(userId) {
         try {
-            const res = await fetch(`${API_BASE}/users/${userId}/stats`);
-            return await res.json();
+            const res = await fetch(`${API_BASE}/users/${userId}/stats?ts=${Date.now()}`);
+            return await this.handleResponse(res);
         } catch (e) {
+            console.error("Stats fetch failed:", e);
             return { assigned_events: 0, pending_requests: 0 };
         }
     },
@@ -45,19 +52,20 @@ export const DataService = {
         const res = await fetch(`${API_BASE}/users/${userId}`, {
             method: 'DELETE'
         });
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async updateUserRoles(userId, roles) {
-        await fetch(`${API_BASE}/users/${userId}/role`, {
+        const res = await fetch(`${API_BASE}/users/${userId}/role`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ roles })
         });
+        return this.handleResponse(res);
     },
 
     async getLocations() {
-        const res = await fetch(`${API_BASE}/locations`);
+        const res = await fetch(`${API_BASE}/locations?ts=${Date.now()}`);
         if (!res.ok) return [];
         return res.json();
     },
@@ -68,24 +76,24 @@ export const DataService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, latitude, longitude })
         });
-        return res.json();
+        return this.handleResponse(res);
     },
 
     async deleteLocation(id) {
         const res = await fetch(`${API_BASE}/locations/${id}`, { method: 'DELETE' });
-        return res.json();
+        return this.handleResponse(res);
     },
 
     // --- Events ---
 
     async getEvents() {
         const res = await fetch(`${API_BASE}/events?ts=${Date.now()}`);
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async getAcceptedEvents(userId) {
         const res = await fetch(`${API_BASE}/users/${userId}/accepted_events?ts=${Date.now()}`);
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async createEvent(eventData) {
@@ -94,61 +102,63 @@ export const DataService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(eventData)
         });
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async updateEvent(eventId, eventData) {
-        await fetch(`${API_BASE}/events/${eventId}`, {
+        const res = await fetch(`${API_BASE}/events/${eventId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(eventData)
         });
+        return this.handleResponse(res);
     },
 
     async deleteEvent(eventId) {
-        await fetch(`${API_BASE}/events/${eventId}`, {
+        const res = await fetch(`${API_BASE}/events/${eventId}`, {
             method: 'DELETE'
         });
+        return this.handleResponse(res);
     },
 
     async getRequestsForUser(userId) {
         const res = await fetch(`${API_BASE}/requests/${userId}?ts=${Date.now()}`);
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async getRequestsForEvent(eventId) {
         const res = await fetch(`${API_BASE}/requests/event/${eventId}?ts=${Date.now()}`);
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async updateRequestStatus(reqId, status) {
-        await fetch(`${API_BASE}/requests/${reqId}`, {
+        const res = await fetch(`${API_BASE}/requests/${reqId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status })
         });
+        return this.handleResponse(res);
     },
 
     // --- Availability ---
 
     async getAvailabilityMap(userId) {
         const res = await fetch(`${API_BASE}/availability/${userId}?ts=${Date.now()}`);
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async getAllAvailability() {
-        // Return array of { user_id, date, status }
         const res = await fetch(`${API_BASE}/availability/all?ts=${Date.now()}`);
-        return await res.json();
+        return this.handleResponse(res);
     },
 
-
     async setAvailability(userId, date, status) {
-        await fetch(`${API_BASE}/availability`, {
+        const res = await fetch(`${API_BASE}/availability`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, date, status })
         });
+        return this.handleResponse(res);
     },
 
     // --- Expenses ---
@@ -159,29 +169,31 @@ export const DataService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(expenseData)
         });
-        return await res.json();
+        return this.handleResponse(res);
     },
 
     async getExpenses(filters = {}) {
         const params = new URLSearchParams(filters).toString();
-        const res = await fetch(`${API_BASE}/expenses?${params}`);
-        return await res.json();
+        const res = await fetch(`${API_BASE}/expenses?${params}&ts=${Date.now()}`);
+        return this.handleResponse(res);
     },
 
     async updateExpenseStatus(expenseId, status) {
-        await fetch(`${API_BASE}/expenses/${expenseId}`, {
+        const res = await fetch(`${API_BASE}/expenses/${expenseId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status })
         });
+        return this.handleResponse(res);
     },
 
     async updatePaymentInfo(userId, paymentInfo) {
-        await fetch(`${API_BASE}/users/${userId}/payment_info`, {
+        const res = await fetch(`${API_BASE}/users/${userId}/payment_info`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ payment_info: paymentInfo })
         });
+        return this.handleResponse(res);
     },
 
     async resetPasswordRequest(email) {
@@ -190,7 +202,7 @@ export const DataService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
         });
-        return res.json();
+        return this.handleResponse(res);
     },
 
     async resetPasswordConfirm(email, otp, newPassword) {
@@ -199,6 +211,7 @@ export const DataService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, otp, new_password: newPassword })
         });
-        return res.json();
+        return this.handleResponse(res);
     }
 };
+
