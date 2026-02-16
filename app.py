@@ -53,9 +53,107 @@ db = SQLAlchemy(app)
 def row_to_dict(row):
     return dict(row._mapping)
 
-# ... (Scheam Init Omitted) ...
+
+# Validates DB connection and creates tables if they don't exist
+def init_schema():
+    try:
+        # Users
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                username TEXT,
+                password TEXT NOT NULL,
+                roles TEXT DEFAULT '[]',
+                base_location TEXT,
+                status TEXT DEFAULT 'active',
+                payment_info TEXT
+            )
+        """))
+        
+        # Events
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS events (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                date TEXT NOT NULL,
+                time TEXT NOT NULL,
+                location TEXT NOT NULL,
+                status TEXT DEFAULT 'scheduled',
+                total_needed INTEGER DEFAULT 1,
+                assigned TEXT DEFAULT '[]'
+            )
+        """))
+
+        # Requests
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS requests (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                event_id TEXT NOT NULL,
+                title TEXT,
+                date TEXT,
+                time TEXT,
+                loc TEXT,
+                status TEXT DEFAULT 'pending'
+            )
+        """))
+        
+        # Availability
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS availability (
+                user_id TEXT,
+                date TEXT,
+                status TEXT,
+                PRIMARY KEY (user_id, date)
+            )
+        """))
+        
+        # Expenses
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS expenses (
+                id TEXT PRIMARY KEY,
+                event_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                amount REAL,
+                description TEXT,
+                status TEXT DEFAULT 'pending',
+                created_at TEXT,
+                group_members TEXT
+            )
+        """))
+        
+        # Locations
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS locations (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                latitude REAL,
+                longitude REAL
+            )
+        """))
+        
+        # OTP Codes
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS otp_codes (
+                email TEXT PRIMARY KEY,
+                code TEXT NOT NULL,
+                expires_at TEXT NOT NULL
+            )
+        """))
+        
+        db.session.commit()
+        print("Schema Initialized")
+    except Exception as e:
+        print(f"Schema Init Error: {e}")
+        db.session.rollback()
 
 # --- Routes ---
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy"}), 200
+
 
 @app.route('/')
 def root():

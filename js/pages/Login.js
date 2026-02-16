@@ -14,7 +14,9 @@ export function LoginPage() {
     card.style.textAlign = 'center';
 
     card.innerHTML = `
-        <h1 style="margin-bottom: var(--spacing-xs); font-size: 2rem;">Orivex</h1>
+
+        <img src="assets/orivex_logo.png" alt="Orivex" style="max-width: 250px; margin-bottom: var(--spacing-sm);">
+
         <p style="margin-bottom: var(--spacing-xl);">Workforce Coordination</p>
         
         <form id="login-form">

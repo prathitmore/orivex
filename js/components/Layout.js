@@ -20,7 +20,9 @@ export function Layout(content) {
     header.style.zIndex = '100';
 
     header.innerHTML = `
-        <div style="font-weight: 700; font-size: 1.25rem; letter-spacing: -0.5px;">Orivex</div>
+
+        <img src="assets/orivex_logo.png" alt="Orivex" style="height: 40px;">
+
         <div id="user-avatar" style="width: 32px; height: 32px; background: var(--color-bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;">
             <!-- Avatar initial -->
         </div>
