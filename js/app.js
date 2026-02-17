@@ -3,7 +3,8 @@ import { Layout } from './components/Layout.js';
 
 // Initialize global persistent background
 const cosmicBg = CosmicBackground();
-document.body.appendChild(cosmicBg);
+document.body.prepend(cosmicBg); // Prepend so it's behind #app
+
 
 import { LoginPage } from './pages/Login.js';
 import { DashboardPage } from './pages/Dashboard.js';

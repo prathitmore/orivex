@@ -5,6 +5,9 @@ export function Layout(content) {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.minHeight = '100vh';
+    container.style.position = 'relative';
+    container.style.zIndex = '1';
+
 
     // Header
     const header = document.createElement('header');
