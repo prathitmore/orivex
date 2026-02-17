@@ -49,25 +49,13 @@ export function Layout(content) {
     nav.style.bottom = '0';
     nav.style.left = '0';
     nav.style.width = '100%';
-    nav.style.backgroundColor = 'rgba(10, 10, 12, 0.85)'; // Darker, more premium background
-    nav.style.backdropFilter = 'blur(16px)'; // Stronger blur
-    nav.style.borderTop = '1px solid rgba(255,255,255,0.08)';
+    nav.style.backgroundColor = 'var(--color-bg-overlay)';
+    nav.style.backdropFilter = 'blur(10px)';
+    nav.style.borderTop = '1px solid rgba(255,255,255,0.05)';
     nav.style.display = 'flex';
-    nav.style.justifyContent = 'space-between';
-    nav.style.padding = '12px 24px'; // More professional breathing room
+    nav.style.justifyContent = 'space-around';
+    nav.style.padding = '8px 0'; // Reduced vertical padding
     nav.style.zIndex = '100';
-    nav.style.boxShadow = '0 -4px 20px rgba(0,0,0,0.4)';
-
-    // Modern SVG Icons (Streamlined outline style)
-    const icons = {
-        home: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
-        horizon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
-        events: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
-        money: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`,
-        team: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
-        clock: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
-        inbox: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`
-    };
 
     // Determine Nav Items based on Role
     let role = 'astronomer';
@@ -80,55 +68,43 @@ export function Layout(content) {
     let navItems = [];
     if (role === 'manager') {
         navItems = [
-            { icon: icons.home, label: 'Home', path: '#/dashboard' },
-            { icon: icons.horizon, label: 'Horizon', path: '#/calendar' },
-            { icon: icons.events, label: 'Events', path: '#/events' },
-            { icon: icons.money, label: 'Pay', path: '#/expenses' },
-            { icon: icons.team, label: 'Team', path: '#/astronomers' }
+            { icon: '🏠', label: 'Home', path: '#/dashboard' },
+            { icon: '🌍', label: 'Horizon', path: '#/calendar' },
+            { icon: '🗓️', label: 'Events', path: '#/events' },
+            { icon: '💰', label: 'Pay', path: '#/expenses' }, // Shortened label
+            { icon: '👥', label: 'Team', path: '#/astronomers' }
         ];
     } else if (role === 'astronomer' || role === 'stargazer') {
         navItems = [
-            { icon: icons.home, label: 'Home', path: '#/dashboard' },
-            { icon: icons.horizon, label: 'Horizon', path: '#/calendar' },
-            { icon: icons.money, label: 'Pay', path: '#/expenses' },
-            { icon: icons.clock, label: 'Avail', path: '#/availability' },
-            { icon: icons.inbox, label: 'Reqs', path: '#/requests' }
+            { icon: '🏠', label: 'Home', path: '#/dashboard' },
+            { icon: '🌍', label: 'Horizon', path: '#/calendar' },
+            { icon: '💰', label: 'Pay', path: '#/expenses' }, // Shortened label
+            { icon: '⏰', label: 'Avail', path: '#/availability' }, // Shortened label
+            { icon: '📩', label: 'Reqs', path: '#/requests' } // Shortened label
         ];
     }
 
     navItems.forEach(item => {
         const link = document.createElement('a');
         link.href = item.path;
-        link.className = 'nav-item'; // For potential CSS hover states
         link.style.display = 'flex';
         link.style.flexDirection = 'column';
         link.style.alignItems = 'center';
-        link.style.justifyContent = 'center';
-        link.style.color = 'var(--color-text-muted)'; // Default muted color
-        link.style.fontSize = '10px';
-        link.style.fontWeight = '500';
-        link.style.gap = '4px';
+        link.style.color = 'var(--color-text-secondary)';
+        link.style.fontSize = '10px'; // Reduced font size
+        link.style.gap = '2px';
         link.style.textDecoration = 'none';
-        link.style.flex = '1'; // Distribute space evenly
-        link.style.transition = 'all 0.2s ease';
+        link.style.minWidth = '40px'; // ensure touch target
 
-        const isActive = window.location.hash.startsWith(item.path);
-
-        // Active State Styling
-        if (isActive) {
-            link.style.color = 'var(--color-accent)'; // Active color
-            link.style.transform = 'translateY(-2px)'; // Subtle lift
+        // Highlight active link
+        if (window.location.hash.startsWith(item.path)) {
+            link.style.color = 'var(--color-accent)';
         }
 
         link.innerHTML = `
-            <div style="opacity: ${isActive ? '1' : '0.7'}; transition: opacity 0.2s;">${item.icon}</div>
-            <span style="letter-spacing: 0.3px;">${item.label}</span>
+            <span style="font-size: 18px;">${item.icon}</span> <!-- Reduced icon size -->
+            <span>${item.label}</span>
         `;
-
-        // Hover effect helper
-        link.onmouseenter = () => { if (!isActive) link.style.color = 'var(--color-text-primary)'; };
-        link.onmouseleave = () => { if (!isActive) link.style.color = 'var(--color-text-muted)'; };
-
         nav.appendChild(link);
     });
 
