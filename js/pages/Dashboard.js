@@ -57,7 +57,7 @@ export async function DashboardPage() {
     // 2. Main Grid (Moon + Forecast + Stats)
     const topGrid = document.createElement('div');
     topGrid.style.display = 'grid';
-    topGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(350px, 1fr))';
+    topGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
     topGrid.style.gap = 'var(--spacing-md)';
     topGrid.style.marginBottom = '60px'; // Significantly larger gap
 

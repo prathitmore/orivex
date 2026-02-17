@@ -89,7 +89,7 @@ button {
 /* Component Classes */
 
 .container {
-    max-width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
     padding: var(--spacing-md);
 }
