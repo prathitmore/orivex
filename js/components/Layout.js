@@ -31,6 +31,7 @@ export function Layout(content) {
     const main = document.createElement('main');
     main.className = 'app-content';
     main.style.flex = '1';
+    main.style.width = '100%'; // Ensure full width
     main.style.padding = 'var(--spacing-md)'; // Reduced from lg
     main.style.maxWidth = '100%';
     main.style.overflowY = 'auto'; // scrollable content
