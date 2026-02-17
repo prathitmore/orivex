@@ -218,9 +218,10 @@ button {
 .calendar-day {
     background-color: var(--color-bg-secondary);
     border-radius: var(--radius-md);
-    padding: 10px;
-    aspect-ratio: 1 / 1.1;
-    /* Slightly taller for desktop text pills */
+    padding: 8px;
+    /* Compact padding for web */
+    aspect-ratio: 1 / 0.85;
+    /* Shorter cells to fit screen vertically */
     display: flex;
     flex-direction: column;
     position: relative;
@@ -228,6 +229,8 @@ button {
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    min-height: 80px;
+    /* Ensure visibility of moon/pills */
 }
 
 .calendar-day:hover {
