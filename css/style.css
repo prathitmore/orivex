@@ -7,35 +7,14 @@
 body {
     margin: 0;
     font-family: var(--font-family);
-    background-color: #050505;
-    /* Very dark background for the "desktop" area */
+    background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     overflow-x: hidden;
-    display: flex;
-    /* Center the app on desktop */
-    justify-content: center;
-    min-height: 100vh;
 }
 
 #app {
     width: 100%;
-    max-width: 480px;
-    /* Mobile width constraint */
-    background-color: var(--color-bg-primary);
-    /* Actual app background */
     min-height: 100vh;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-    /* Shadow to lift it off the desktop bg */
-    position: relative;
-    overflow-x: hidden;
-}
-
-/* Ensure fixed elements stay within the constrained width */
-.app-header,
-.app-nav {
-    max-width: 480px;
-    left: 50% !important;
-    transform: translateX(-50%);
 }
 
 h1,
