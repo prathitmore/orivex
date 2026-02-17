@@ -20,6 +20,54 @@ export function CosmicBackground() {
     let targetX = 0, targetY = 0;
     let isDestroyed = false;
 
+    const onWindowResize = () => {
+        if (!camera || !renderer) return;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    const onMouseMove = (e) => {
+        mouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+        mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+    };
+
+    const onTouchMove = (e) => {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            mouseX = (touch.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+            mouseY = (touch.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+        }
+    };
+
+    const createCloudTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128; canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+        gradient.addColorStop(0.2, 'rgba(100, 150, 255, 0.1)');
+        gradient.addColorStop(0.5, 'rgba(50, 0, 100, 0.05)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 128, 128);
+        return new THREE.CanvasTexture(canvas);
+    };
+
+    const createStarTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 64, 64);
+        return new THREE.CanvasTexture(canvas);
+    };
+
     const setup = () => {
         if (isDestroyed) return;
 
@@ -187,53 +235,7 @@ export function CosmicBackground() {
         }
     };
 
-    const onWindowResize = () => {
-        if (!camera || !renderer) return;
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    };
 
-    const onMouseMove = (e) => {
-        mouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-        mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-    };
-
-    const onTouchMove = (e) => {
-        if (e.touches.length > 0) {
-            const touch = e.touches[0];
-            mouseX = (touch.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-            mouseY = (touch.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        }
-    };
-
-    const createCloudTexture = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 128; canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-        gradient.addColorStop(0.2, 'rgba(100, 150, 255, 0.1)');
-        gradient.addColorStop(0.5, 'rgba(50, 0, 100, 0.05)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, 128, 128);
-        return new THREE.CanvasTexture(canvas);
-    };
-
-    const createStarTexture = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 64; canvas.height = 64;
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
-        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, 64, 64);
-        return new THREE.CanvasTexture(canvas);
-    };
 
     // Initialize only if THREE is available
     if (window.THREE) {
