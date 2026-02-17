@@ -8,7 +8,7 @@ import { DataService } from './data.js';
 // No, apig-wsgi handles this usually.
 // Let's try pointing directly to the function endpoint.
 // Revert to relative path for standard deployments (Ngrok, PythonAnywhere, Render)
-const API_BASE = '/api';
+const API_BASE = './api';
 const USER_STORAGE_KEY = 'orivex_user';
 
 export const AuthService = {

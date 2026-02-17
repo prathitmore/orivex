@@ -24,6 +24,22 @@ app = Flask(__name__, static_folder='.', static_url_path='')
 app.url_map.strict_slashes = False
 CORS(app)
 
+# --- Middleware for Subdirectory Serving (/app) ---
+class PrefixMiddleware(object):
+    def __init__(self, app, prefix='/app'):
+        self.app = app
+        self.prefix = prefix
+
+    def __call__(self, environ, start_response):
+        if environ['PATH_INFO'].startswith(self.prefix):
+            environ['PATH_INFO'] = environ['PATH_INFO'][len(self.prefix):]
+            if not environ['PATH_INFO']: # Handle /app -> /
+                environ['PATH_INFO'] = '/'
+            environ['SCRIPT_NAME'] = self.prefix
+        return self.app(environ, start_response)
+
+app.wsgi_app = PrefixMiddleware(app.wsgi_app)
+
 # Allow serving from root directory - NOT NEEDED on Netlify (Static files served by CDN)
 # app.wsgi_app = WhiteNoise(app.wsgi_app, root=BASE_DIR, prefix='/', index_file='index.html', autorefresh=True)
 

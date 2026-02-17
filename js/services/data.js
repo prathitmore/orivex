@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = './api';
 
 export const DataService = {
     async handleResponse(res) {
