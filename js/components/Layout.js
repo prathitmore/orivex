@@ -146,37 +146,5 @@ export function Layout(content) {
         }
     }, 0);
 
-    // Responsive Desktop Styles
-    const style = document.createElement('style');
-    style.textContent = `
-        @media (min-width: 768px) {
-            .app-nav {
-                top: 60px !important; /* Below header */
-                bottom: 0 !important;
-                left: 0 !important;
-                width: 80px !important;
-                height: calc(100vh - 60px) !important;
-                flex-direction: column !important;
-                justify-content: flex-start !important;
-                padding-top: 20px !important;
-                border-top: none !important;
-                border-right: 1px solid rgba(255,255,255,0.08) !important;
-                box-shadow: 4px 0 20px rgba(0,0,0,0.2) !important;
-            }
-            .app-nav a {
-                flex: 0 !important;
-                margin-bottom: 24px !important;
-                width: 100% !important;
-            }
-            .app-content {
-                margin-bottom: 0 !important;
-                margin-left: 80px !important;
-            }
-            /* Optional: Tooltips for icons on desktop since labels might be small/hidden? 
-               Actually labels are small (10px). Let's keep them. */
-        }
-    `;
-    container.appendChild(style);
-
     return container;
 }
