@@ -1,14 +1,9 @@
-/**
- * CosmicBackground.js
- * A premium Three.js background featuring a nebula and interactive starfield.
- */
-
 export function CosmicBackground() {
-    // Singleton Check: If it already exists, don't create a new one
-    const existing = document.getElementById('cosmic-background');
-    if (existing) return existing;
+    // Singleton Check: If it already exists, just return it
+    let container = document.getElementById('cosmic-background');
+    if (container) return container;
 
-    const container = document.createElement('div');
+    container = document.createElement('div');
     container.id = 'cosmic-background';
     container.style.position = 'fixed';
     container.style.top = '0';
@@ -16,7 +11,7 @@ export function CosmicBackground() {
     container.style.width = '100vw';
     container.style.height = '100vh';
     container.style.zIndex = '0';
-    container.style.background = '#020205'; // Even darker for contrast
+    container.style.background = '#020205';
     container.style.pointerEvents = 'none';
 
     let renderer, scene, camera, stars, nebula;
@@ -25,67 +20,34 @@ export function CosmicBackground() {
     let targetX = 0, targetY = 0;
     let isDestroyed = false;
 
-    const init = () => {
-        if (window.THREE) {
-            setup();
-        } else {
-            // Fallback for extreme edge cases: listen for load on existing script or add it
-            const existingScript = document.querySelector('script[src*="three.min.js"]');
-            if (existingScript) {
-                existingScript.addEventListener('load', setup);
-            } else {
-                // If not found in DOM, log error (should be in index.html now)
-                console.error("Three.js not found. Ensure it is included in index.html");
-            }
-        }
-    };
-
-    const createCloudTexture = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 128;
-        canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-        gradient.addColorStop(0.2, 'rgba(100, 150, 255, 0.1)');
-        gradient.addColorStop(0.5, 'rgba(50, 0, 100, 0.05)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, 128, 128);
-        return new THREE.CanvasTexture(canvas);
-    };
-
-    const createStarTexture = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 64;
-        canvas.height = 64;
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
-        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, 64, 64);
-        return new THREE.CanvasTexture(canvas);
-    };
-
     const setup = () => {
         if (isDestroyed) return;
 
         const THREE = window.THREE;
+        if (!THREE) return;
+
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
-        camera.position.z = 1200; // Move back for cinematic depth
+        camera.position.z = 1200;
 
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
+        try {
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true,
+                powerPreference: "high-performance"
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+        } catch (e) {
+            console.error("WebGL Initialization failed:", e);
+            container.style.background = "linear-gradient(to bottom, #020205, #0a0a1a)";
+            return;
+        }
 
         // 1. Starfield
         const starGeo = new THREE.BufferGeometry();
-        const starCount = 50000; // Signficantly increased density
+        const starCount = 50000;
         const starPos = new Float32Array(starCount * 3);
         const starColors = new Float32Array(starCount * 3);
 
@@ -94,34 +56,31 @@ export function CosmicBackground() {
             starPos[i * 3 + 1] = (Math.random() - 0.5) * 2000;
             starPos[i * 3 + 2] = (Math.random() - 0.5) * 2000;
 
-            const r = 0.82 + Math.random() * 0.18;
-            const g = 0.82 + Math.random() * 0.18;
-            const b = 0.9 + Math.random() * 0.1;
-            starColors[i * 3] = r;
-            starColors[i * 3 + 1] = g;
-            starColors[i * 3 + 2] = b;
+            starColors[i * 3] = 0.82 + Math.random() * 0.18;
+            starColors[i * 3 + 1] = 0.82 + Math.random() * 0.18;
+            starColors[i * 3 + 2] = 0.9 + Math.random() * 0.1;
         }
 
         starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
         starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
         const starMaterial = new THREE.PointsMaterial({
-            size: 3.5, // Slightly smaller to allow for more density without overlapping too much
+            size: 3.5,
             map: createStarTexture(),
             vertexColors: true,
             transparent: true,
             opacity: 1,
             sizeAttenuation: true,
-            alphaTest: 0.1, // Clipping
+            alphaTest: 0.1,
             blending: THREE.AdditiveBlending
         });
 
         stars = new THREE.Points(starGeo, starMaterial);
         scene.add(stars);
 
-        // 2. Nebula (Simplified Cloud Sprite System)
+        // 2. Nebula
         const cloudTexture = createCloudTexture();
-        const nebulaCount = 100; // Richer nebula clouds
+        const nebulaCount = 100;
         const nebulaGroup = new THREE.Group();
 
         for (let i = 0; i < nebulaCount; i++) {
@@ -130,25 +89,19 @@ export function CosmicBackground() {
                 transparent: true,
                 opacity: 0.1 + Math.random() * 0.2,
                 blending: THREE.AdditiveBlending,
-                color: new THREE.Color().setHSL(Math.random() * 0.2 + 0.6, 0.5, 0.5) // Purple/Blue range
+                color: new THREE.Color().setHSL(Math.random() * 0.2 + 0.6, 0.5, 0.5)
             });
             const sprite = new THREE.Sprite(material);
-            sprite.position.set(
-                (Math.random() - 0.5) * 800,
-                (Math.random() - 0.5) * 800,
-                (Math.random() - 0.5) * 400 - 200
-            );
+            sprite.position.set((Math.random() - 0.5) * 800, (Math.random() - 0.5) * 800, (Math.random() - 0.5) * 400 - 200);
             sprite.scale.set(300, 300, 1);
             nebulaGroup.add(sprite);
         }
         nebula = nebulaGroup;
         scene.add(nebula);
 
-        // 3. Andromeda Galaxy (Photo Spirit System with Background Removal)
+        // 3. Andromeda Galaxy
         const loader = new THREE.TextureLoader();
-        console.log("Loading galaxy from assets/andromeda.jpg...");
         loader.load('assets/andromeda.jpg', (texture) => {
-            console.log("Galaxy texture loaded successfully!");
             const img = texture.image;
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
@@ -156,24 +109,16 @@ export function CosmicBackground() {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
 
-            // Process pixels to remove black background and noise (which causes trails)
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imgData.data;
             for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
-
-                // HIGHER POWER (2.2) and a slight threshold to kill faint noise
-                // This 'cleans' the image so only the bright spirals remain, avoiding trails.
-                const alpha = Math.max(0, Math.pow(brightness / 255, 2.2) * 1.1 - 0.1);
-                data[i + 3] = alpha * 255;
+                const brightness = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
+                data[i + 3] = Math.max(0, Math.pow(brightness / 255, 2.2) * 1.1 - 0.1) * 255;
             }
             ctx.putImageData(imgData, 0, 0);
 
             const processedTexture = new THREE.CanvasTexture(canvas);
-            processedTexture.anisotropy = 16; // Maximum sharpness
+            processedTexture.anisotropy = 16;
             processedTexture.minFilter = THREE.LinearFilter;
             processedTexture.magFilter = THREE.LinearFilter;
 
@@ -186,29 +131,23 @@ export function CosmicBackground() {
             });
 
             const galaxySprite = new THREE.Sprite(material);
-
-            // Absolute proportional scale based on image dimensions
             const imgAspect = img.width / img.height;
-            const targetWidth = 3000; // Large coverage for 45 FOV
+            const targetWidth = 3000;
             galaxySprite.scale.set(targetWidth, targetWidth / imgAspect, 1);
-
-            galaxySprite.position.set(0, 0, -200); // Distance adjusted for flatter 45 FOV
+            galaxySprite.position.set(0, 0, -200);
             scene.add(galaxySprite);
 
             container.andromeda = galaxySprite;
 
-            // Reveal
             let reveal = 0;
             const fadeIn = () => {
                 if (reveal < 1.0) {
-                    reveal += 0.05; // Faster, crisper load
+                    reveal += 0.05;
                     material.opacity = reveal;
                     requestAnimationFrame(fadeIn);
                 }
             };
             fadeIn();
-        }, undefined, (err) => {
-            console.error("Galaxy texture failed to load:", err);
         });
 
         window.addEventListener('resize', onWindowResize);
@@ -216,13 +155,43 @@ export function CosmicBackground() {
         document.addEventListener('touchmove', onTouchMove, { passive: false });
         document.addEventListener('touchstart', onTouchMove, { passive: false });
 
-
-        // Force a resize/render shortly after setup to ensure correct dimensions
-        setTimeout(() => {
-            if (!isDestroyed) onWindowResize();
-        }, 100);
-
         animate();
+    };
+
+    const animate = () => {
+        if (isDestroyed) return;
+        animationId = requestAnimationFrame(animate);
+
+        targetX += (mouseX - targetX) * 0.03;
+        targetY += (mouseY - targetY) * 0.03;
+
+        if (stars) {
+            stars.rotation.y += 0.0002;
+            stars.rotation.x += 0.0001;
+            stars.position.x = targetX * 25;
+            stars.position.y = -targetY * 25;
+        }
+        if (nebula) {
+            nebula.rotation.z += 0.0005;
+            nebula.position.x = targetX * 30;
+            nebula.position.y = -targetY * 30;
+        }
+        if (container.andromeda) {
+            container.andromeda.rotation.z += 0.0001;
+            container.andromeda.position.x = targetX * 25;
+            container.andromeda.position.y = -targetY * 25;
+        }
+
+        if (renderer && scene && camera) {
+            renderer.render(scene, camera);
+        }
+    };
+
+    const onWindowResize = () => {
+        if (!camera || !renderer) return;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
     const onMouseMove = (e) => {
@@ -238,63 +207,45 @@ export function CosmicBackground() {
         }
     };
 
-    const onWindowResize = () => {
-        if (!camera || !renderer) return;
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+    const createCloudTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128; canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+        gradient.addColorStop(0.2, 'rgba(100, 150, 255, 0.1)');
+        gradient.addColorStop(0.5, 'rgba(50, 0, 100, 0.05)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 128, 128);
+        return new THREE.CanvasTexture(canvas);
     };
 
-    const animate = () => {
-        if (isDestroyed) return;
-        animationId = requestAnimationFrame(animate);
-
-        targetX += (mouseX - targetX) * 0.03;
-        targetY += (mouseY - targetY) * 0.03;
-
-        if (stars) {
-            stars.rotation.y += 0.0002;
-            stars.rotation.x += 0.0001;
-
-            // Reduced Parallax to avoid trails (from 50 to 25)
-            stars.position.x = targetX * 25;
-            stars.position.y = -targetY * 25;
-        }
-
-        if (nebula) {
-            nebula.rotation.z += 0.0005;
-            nebula.position.x = targetX * 30;
-            nebula.position.y = -targetY * 30;
-        }
-
-        if (container.andromeda) {
-            // Apply SAME rotation as stars so internal stars and procedural stars move together
-            // Sprites only rotate on Z, so we simulate the X/Y orbit by syncing the position
-            container.andromeda.rotation.z += 0.0001; // Subtle self-roll
-
-            // Sync parallax (25 offset)
-            container.andromeda.position.x = targetX * 25;
-            container.andromeda.position.y = -targetY * 25;
-        }
-
-        if (renderer && scene && camera) {
-            renderer.render(scene, camera);
-        }
+    const createStarTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 64, 64);
+        return new THREE.CanvasTexture(canvas);
     };
 
-    container.cleanup = () => {
-        isDestroyed = true;
-        cancelAnimationFrame(animationId);
-        window.removeEventListener('resize', onWindowResize);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('touchmove', onTouchMove);
-        document.removeEventListener('touchstart', onTouchMove);
-        if (renderer) {
-            renderer.dispose();
-            // Also dispose geometries/materials ideally
-        }
-    };
+    // Initialize only if THREE is available
+    if (window.THREE) {
+        setup();
+    } else {
+        const checkThree = setInterval(() => {
+            if (window.THREE) {
+                setup();
+                clearInterval(checkThree);
+            }
+        }, 100);
+    }
 
-    init();
     return container;
 }

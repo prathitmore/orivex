@@ -1,24 +1,8 @@
 import { AuthService } from '../services/auth.js';
 import { DataService } from '../services/data.js';
-import { CosmicBackground } from '../components/CosmicBackground.js';
 
 export function LoginPage() {
     const container = document.createElement('div');
-
-    // Mount Cosmic Background
-    const cosmicBg = CosmicBackground();
-    document.body.appendChild(cosmicBg);
-
-    // Cleanup logic
-    const observer = new MutationObserver((mutations) => {
-        if (!document.body.contains(container)) {
-            if (cosmicBg.cleanup) cosmicBg.cleanup();
-            if (cosmicBg.parentNode) cosmicBg.parentNode.removeChild(cosmicBg);
-            observer.disconnect();
-        }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-
     container.className = 'login-page flex flex-col items-center justify-center min-h-screen';
     container.style.padding = 'var(--spacing-lg)';
     container.style.position = 'relative';

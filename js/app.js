@@ -1,5 +1,8 @@
+import { CosmicBackground } from './components/CosmicBackground.js';
 
-import { Layout } from './components/Layout.js';
+// Initialize global persistent background
+const cosmicBg = CosmicBackground();
+document.body.appendChild(cosmicBg);
 import { LoginPage } from './pages/Login.js';
 import { DashboardPage } from './pages/Dashboard.js';
 import { EventsPage } from './pages/Events.js';

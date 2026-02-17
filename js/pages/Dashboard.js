@@ -1,7 +1,7 @@
 import { AuthService } from '../services/auth.js';
 import { DataService } from '../services/data.js';
 import { getMoonPhase } from './HorizonCalendar.js';
-import { CosmicBackground } from '../components/CosmicBackground.js';
+
 
 export async function DashboardPage() {
     let user = AuthService.getCurrentUser();
@@ -13,19 +13,6 @@ export async function DashboardPage() {
 
     const container = document.createElement('div');
 
-    // Mount Cosmic Background to body instead of container
-    const cosmicBg = CosmicBackground();
-    document.body.appendChild(cosmicBg);
-
-    // MutationObserver to detect when the dashboard is removed from DOM to cleanup Three.js
-    const observer = new MutationObserver((mutations) => {
-        if (!document.body.contains(container)) {
-            if (cosmicBg.cleanup) cosmicBg.cleanup();
-            if (cosmicBg.parentNode) cosmicBg.parentNode.removeChild(cosmicBg);
-            observer.disconnect();
-        }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
 
     container.className = 'container fade-in';
     container.style.position = 'relative';
