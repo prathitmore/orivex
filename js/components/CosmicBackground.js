@@ -75,8 +75,8 @@ export function CosmicBackground() {
 
         const THREE = window.THREE;
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-        camera.position.z = 100;
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
+        camera.position.z = 1200; // Move back for cinematic depth
 
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -156,34 +156,43 @@ export function CosmicBackground() {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
 
-            // Process pixels to remove black background
+            // Process pixels to remove black background and noise (which causes trails)
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imgData.data;
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i];
                 const g = data[i + 1];
                 const b = data[i + 2];
-                // Luma calculation
                 const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
 
-                // Increase contrast and set alpha based on brightness
-                // This makes dark areas transparent and keeps the bright spirals
-                data[i + 3] = Math.pow(brightness / 255, 1.5) * 255;
+                // HIGHER POWER (2.2) and a slight threshold to kill faint noise
+                // This 'cleans' the image so only the bright spirals remain, avoiding trails.
+                const alpha = Math.max(0, Math.pow(brightness / 255, 2.2) * 1.1 - 0.1);
+                data[i + 3] = alpha * 255;
             }
             ctx.putImageData(imgData, 0, 0);
 
             const processedTexture = new THREE.CanvasTexture(canvas);
+            processedTexture.anisotropy = 16; // Maximum sharpness
+            processedTexture.minFilter = THREE.LinearFilter;
+            processedTexture.magFilter = THREE.LinearFilter;
+
             const material = new THREE.SpriteMaterial({
                 map: processedTexture,
                 transparent: true,
                 opacity: 0,
-                blending: THREE.AdditiveBlending, // Best for glowing cosmic objects
+                blending: THREE.AdditiveBlending,
                 color: 0xffffff
             });
 
             const galaxySprite = new THREE.Sprite(material);
-            galaxySprite.position.set(0, 0, -450);
-            galaxySprite.scale.set(1600, 1200, 1);
+
+            // Absolute proportional scale based on image dimensions
+            const imgAspect = img.width / img.height;
+            const targetWidth = 3000; // Large coverage for 45 FOV
+            galaxySprite.scale.set(targetWidth, targetWidth / imgAspect, 1);
+
+            galaxySprite.position.set(0, 0, -200); // Distance adjusted for flatter 45 FOV
             scene.add(galaxySprite);
 
             container.andromeda = galaxySprite;
@@ -192,7 +201,7 @@ export function CosmicBackground() {
             let reveal = 0;
             const fadeIn = () => {
                 if (reveal < 1.0) {
-                    reveal += 0.02;
+                    reveal += 0.05; // Faster, crisper load
                     material.opacity = reveal;
                     requestAnimationFrame(fadeIn);
                 }
@@ -247,9 +256,9 @@ export function CosmicBackground() {
             stars.rotation.y += 0.0002;
             stars.rotation.x += 0.0001;
 
-            // Parallax
-            stars.position.x = targetX * 50;
-            stars.position.y = -targetY * 50;
+            // Reduced Parallax to avoid trails (from 50 to 25)
+            stars.position.x = targetX * 25;
+            stars.position.y = -targetY * 25;
         }
 
         if (nebula) {
@@ -259,9 +268,13 @@ export function CosmicBackground() {
         }
 
         if (container.andromeda) {
-            // Sync with stars parallax (50 offset)
-            container.andromeda.position.x = 0 + targetX * 50;
-            container.andromeda.position.y = 0 - targetY * 50;
+            // Apply SAME rotation as stars so internal stars and procedural stars move together
+            // Sprites only rotate on Z, so we simulate the X/Y orbit by syncing the position
+            container.andromeda.rotation.z += 0.0001; // Subtle self-roll
+
+            // Sync parallax (25 offset)
+            container.andromeda.position.x = targetX * 25;
+            container.andromeda.position.y = -targetY * 25;
         }
 
         if (renderer && scene && camera) {
