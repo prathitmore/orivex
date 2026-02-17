@@ -12,11 +12,6 @@ body {
     overflow-x: hidden;
 }
 
-#app {
-    width: 100%;
-    min-height: 100vh;
-}
-
 h1,
 h2,
 h3,
@@ -94,7 +89,7 @@ button {
 /* Component Classes */
 
 .container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: var(--spacing-md);
 }
