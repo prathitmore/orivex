@@ -4,6 +4,10 @@
  */
 
 export function CosmicBackground() {
+    // Singleton Check: If it already exists, don't create a new one
+    const existing = document.getElementById('cosmic-background');
+    if (existing) return existing;
+
     const container = document.createElement('div');
     container.id = 'cosmic-background';
     container.style.position = 'fixed';
@@ -12,7 +16,7 @@ export function CosmicBackground() {
     container.style.width = '100vw';
     container.style.height = '100vh';
     container.style.zIndex = '0';
-    container.style.background = '#050508'; // Deep space black-blue
+    container.style.background = '#020205'; // Even darker for contrast
     container.style.pointerEvents = 'none';
 
     let renderer, scene, camera, stars, nebula;
@@ -140,38 +144,62 @@ export function CosmicBackground() {
         nebula = nebulaGroup;
         scene.add(nebula);
 
-        // 3. Andromeda Galaxy (Photo Spirit System)
+        // 3. Andromeda Galaxy (Photo Spirit System with Background Removal)
         const loader = new THREE.TextureLoader();
+        console.log("Loading galaxy from assets/andromeda.jpg...");
         loader.load('assets/andromeda.jpg', (texture) => {
+            console.log("Galaxy texture loaded successfully!");
+            const img = texture.image;
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            // Process pixels to remove black background
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                // Luma calculation
+                const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+
+                // Increase contrast and set alpha based on brightness
+                // This makes dark areas transparent and keeps the bright spirals
+                data[i + 3] = Math.pow(brightness / 255, 1.5) * 255;
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+            const processedTexture = new THREE.CanvasTexture(canvas);
             const material = new THREE.SpriteMaterial({
-                map: texture,
+                map: processedTexture,
                 transparent: true,
-                opacity: 0, // Fade in
-                blending: THREE.AdditiveBlending,
+                opacity: 0,
+                blending: THREE.AdditiveBlending, // Best for glowing cosmic objects
                 color: 0xffffff
             });
 
             const galaxySprite = new THREE.Sprite(material);
-            // Position it centrally but deep
-            galaxySprite.position.set(0, 0, -800);
-            galaxySprite.scale.set(1200, 1000, 1); // Large presence
+            galaxySprite.position.set(0, 0, -450);
+            galaxySprite.scale.set(1600, 1200, 1);
             scene.add(galaxySprite);
 
-            // Track for animation
             container.andromeda = galaxySprite;
 
-            // Smooth fade in
+            // Reveal
             let reveal = 0;
             const fadeIn = () => {
-                if (reveal < 0.7) {
-                    reveal += 0.01;
+                if (reveal < 1.0) {
+                    reveal += 0.02;
                     material.opacity = reveal;
                     requestAnimationFrame(fadeIn);
                 }
             };
             fadeIn();
         }, undefined, (err) => {
-            console.error("Failed to load galaxy texture:", err);
+            console.error("Galaxy texture failed to load:", err);
         });
 
         window.addEventListener('resize', onWindowResize);
