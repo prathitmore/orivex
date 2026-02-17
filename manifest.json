@@ -1,21 +1,21 @@
 {
-    "name": "Orivex",
+    "name": "Orivex Horizon",
     "short_name": "Orivex",
-    "description": "Horizon Astronomical Society App",
-    "start_url": "./index.html",
+    "start_url": "./",
     "display": "standalone",
-    "background_color": "#000000",
-    "theme_color": "#000000",
+    "background_color": "#121212",
+    "theme_color": "#4A90E2",
+    "description": "Horizon Astronomical Society Platform",
     "icons": [
         {
-            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23FFFFFF'/><circle cx='50' cy='50' r='40' fill='%23121212'/></svg>",
+            "src": "assets/icon_192.png",
             "sizes": "192x192",
-            "type": "image/svg+xml"
+            "type": "image/png"
         },
         {
-            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23FFFFFF'/><circle cx='50' cy='50' r='40' fill='%23121212'/></svg>",
+            "src": "assets/icon_512.png",
             "sizes": "512x512",
-            "type": "image/svg+xml"
+            "type": "image/png"
         }
     ]
 }

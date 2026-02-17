@@ -1,17 +1,37 @@
-
 import { AuthService } from '../services/auth.js';
 import { DataService } from '../services/data.js';
+import { CosmicBackground } from '../components/CosmicBackground.js';
 
 export function LoginPage() {
     const container = document.createElement('div');
+
+    // Mount Cosmic Background
+    const cosmicBg = CosmicBackground();
+    document.body.appendChild(cosmicBg);
+
+    // Cleanup logic
+    const observer = new MutationObserver((mutations) => {
+        if (!document.body.contains(container)) {
+            if (cosmicBg.cleanup) cosmicBg.cleanup();
+            if (cosmicBg.parentNode) cosmicBg.parentNode.removeChild(cosmicBg);
+            observer.disconnect();
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
     container.className = 'login-page flex flex-col items-center justify-center min-h-screen';
     container.style.padding = 'var(--spacing-lg)';
+    container.style.position = 'relative';
+    container.style.zIndex = '1';
+    container.style.background = 'transparent';
 
     const card = document.createElement('div');
     card.className = 'card fade-in';
     card.style.maxWidth = '400px';
     card.style.width = '100%';
     card.style.textAlign = 'center';
+    card.style.backdropFilter = 'blur(8px)';
+    card.style.background = 'rgba(30, 41, 59, 0.4)';
 
     card.innerHTML = `
 
@@ -26,7 +46,11 @@ export function LoginPage() {
         <form id="login-form">
             <input type="text" id="username-input" class="input" placeholder="Email or Username" style="margin-bottom: var(--spacing-md);" required>
             <input type="password" id="password-input" class="input" placeholder="Password" style="margin-bottom: var(--spacing-lg);" required>
-            <div style="text-align: right; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="remember-me" style="width: 16px; height: 16px; accent-color: var(--color-accent);">
+                    <label for="remember-me" style="font-size: 0.85rem; color: var(--color-text-secondary); cursor: pointer;">Remember Me</label>
+                </div>
                 <a href="#" id="forgot-password-link" style="color: var(--color-accent); font-size: 0.85rem; text-decoration: none;">Forgot Password?</a>
             </div>
             <button type="submit" id="login-btn" class="btn btn-primary w-full">Sign In</button>
@@ -154,6 +178,7 @@ export function LoginPage() {
         e.preventDefault();
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
+        const rememberMe = card.querySelector('#remember-me').checked;
 
         if (!username || !password) {
             errorMsg.textContent = 'Please enter email and password.';
@@ -164,7 +189,7 @@ export function LoginPage() {
             loginBtn.textContent = 'Signing in...';
             loginBtn.disabled = true;
 
-            const result = await AuthService.login(username, password);
+            const result = await AuthService.login(username, password, rememberMe);
 
             if (result.success) {
                 if (result.user.roles.length > 1) {

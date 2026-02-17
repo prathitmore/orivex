@@ -45,7 +45,7 @@ async function router() {
     // Auth Check (Simple)
     const publicPages = ['/', '/login'];
     const noNavPages = ['/', '/login', '/role-select'];
-    const user = sessionStorage.getItem('orivex_user');
+    const user = sessionStorage.getItem('orivex_user') || localStorage.getItem('orivex_user');
 
     if (!user && !publicPages.includes(path)) {
         window.location.hash = '#/login';

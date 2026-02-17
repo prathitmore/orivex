@@ -1,26 +1,32 @@
-
 import { AuthService } from '../services/auth.js';
 import { DataService } from '../services/data.js';
+import { CosmicBackground } from '../components/CosmicBackground.js';
 
 export async function RoleSelectionPage() {
     let user = AuthService.getCurrentUser();
     if (!user) return document.createComment('Redirecting...');
 
-    // Refresh user data to get latest roles
-    try {
-        const freshUser = await DataService.getUser(user.id);
-        if (freshUser) {
-            freshUser.currentRole = user.currentRole || freshUser.roles[0];
-            sessionStorage.setItem('orivex_user', JSON.stringify(freshUser));
-            user = freshUser;
-        }
-    } catch (e) {
-        console.error("Failed to refresh user roles:", e);
-    }
-
     const container = document.createElement('div');
+
+    // Mount Cosmic Background
+    const cosmicBg = CosmicBackground();
+    document.body.appendChild(cosmicBg);
+
+    // Cleanup logic
+    const observer = new MutationObserver((mutations) => {
+        if (!document.body.contains(container)) {
+            if (cosmicBg.cleanup) cosmicBg.cleanup();
+            if (cosmicBg.parentNode) cosmicBg.parentNode.removeChild(cosmicBg);
+            observer.disconnect();
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
     container.className = 'flex flex-col items-center justify-center min-h-screen fade-in';
     container.style.padding = 'var(--spacing-lg)';
+    container.style.position = 'relative';
+    container.style.zIndex = '1';
+    container.style.background = 'transparent';
 
     const heading = document.createElement('h2');
     heading.textContent = 'Select Dashboard';

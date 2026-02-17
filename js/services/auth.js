@@ -10,14 +10,15 @@ import { DataService } from './data.js';
 // Revert to relative path for standard deployments (Ngrok, PythonAnywhere, Render)
 const API_BASE = './api';
 const USER_STORAGE_KEY = 'orivex_user';
+const REMEMBER_KEY = 'orivex_remember';
 
 export const AuthService = {
     isAuthenticated() {
-        return !!sessionStorage.getItem(USER_STORAGE_KEY);
+        return !!(sessionStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(USER_STORAGE_KEY));
     },
 
     getCurrentUser() {
-        const userStr = sessionStorage.getItem(USER_STORAGE_KEY);
+        const userStr = sessionStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(USER_STORAGE_KEY);
         return userStr ? JSON.parse(userStr) : null;
     },
 
@@ -42,7 +43,12 @@ export const AuthService = {
                     freshUser.currentRole = freshUser.roles[0];
                 }
 
-                sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(freshUser));
+                if (sessionStorage.getItem(USER_STORAGE_KEY)) {
+                    sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(freshUser));
+                }
+                if (localStorage.getItem(USER_STORAGE_KEY)) {
+                    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(freshUser));
+                }
                 return freshUser;
             }
         } catch (e) {
@@ -67,7 +73,12 @@ export const AuthService = {
                     const user = data.user;
                     // Add currentRole for UI
                     user.currentRole = user.roles[0];
-                    sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+
+                    if (arguments[2] === true) { // Optional 3rd param for rememberMe
+                        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+                    } else {
+                        sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+                    }
                     return { success: true, user };
                 } else {
                     return { success: false, message: data.message };
@@ -85,6 +96,7 @@ export const AuthService = {
 
     logout() {
         sessionStorage.removeItem(USER_STORAGE_KEY);
+        localStorage.removeItem(USER_STORAGE_KEY);
         window.location.hash = '#/login';
         window.location.reload();
     },
@@ -93,7 +105,12 @@ export const AuthService = {
         const user = this.getCurrentUser();
         if (user && user.roles.includes(newRole)) {
             user.currentRole = newRole;
-            sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+            if (sessionStorage.getItem(USER_STORAGE_KEY)) {
+                sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+            }
+            if (localStorage.getItem(USER_STORAGE_KEY)) {
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+            }
             return true;
         }
         return false;

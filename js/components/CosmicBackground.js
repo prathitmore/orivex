@@ -81,7 +81,7 @@ export function CosmicBackground() {
 
         // 1. Starfield
         const starGeo = new THREE.BufferGeometry();
-        const starCount = 18000; // Increased fro 10000
+        const starCount = 50000; // Signficantly increased density
         const starPos = new Float32Array(starCount * 3);
         const starColors = new Float32Array(starCount * 3);
 
@@ -90,8 +90,8 @@ export function CosmicBackground() {
             starPos[i * 3 + 1] = (Math.random() - 0.5) * 2000;
             starPos[i * 3 + 2] = (Math.random() - 0.5) * 2000;
 
-            const r = 0.8 + Math.random() * 0.2;
-            const g = 0.8 + Math.random() * 0.2;
+            const r = 0.82 + Math.random() * 0.18;
+            const g = 0.82 + Math.random() * 0.18;
             const b = 0.9 + Math.random() * 0.1;
             starColors[i * 3] = r;
             starColors[i * 3 + 1] = g;
@@ -102,7 +102,7 @@ export function CosmicBackground() {
         starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
         const starMaterial = new THREE.PointsMaterial({
-            size: 4, // Larger size to show circular glow
+            size: 3.5, // Slightly smaller to allow for more density without overlapping too much
             map: createStarTexture(),
             vertexColors: true,
             transparent: true,
@@ -117,7 +117,7 @@ export function CosmicBackground() {
 
         // 2. Nebula (Simplified Cloud Sprite System)
         const cloudTexture = createCloudTexture();
-        const nebulaCount = 60; // Increased from 50
+        const nebulaCount = 100; // Richer nebula clouds
         const nebulaGroup = new THREE.Group();
 
         for (let i = 0; i < nebulaCount; i++) {
@@ -139,6 +139,40 @@ export function CosmicBackground() {
         }
         nebula = nebulaGroup;
         scene.add(nebula);
+
+        // 3. Andromeda Galaxy (Photo Spirit System)
+        const loader = new THREE.TextureLoader();
+        loader.load('assets/andromeda.jpg', (texture) => {
+            const material = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0, // Fade in
+                blending: THREE.AdditiveBlending,
+                color: 0xffffff
+            });
+
+            const galaxySprite = new THREE.Sprite(material);
+            // Position it centrally but deep
+            galaxySprite.position.set(0, 0, -800);
+            galaxySprite.scale.set(1200, 1000, 1); // Large presence
+            scene.add(galaxySprite);
+
+            // Track for animation
+            container.andromeda = galaxySprite;
+
+            // Smooth fade in
+            let reveal = 0;
+            const fadeIn = () => {
+                if (reveal < 0.7) {
+                    reveal += 0.01;
+                    material.opacity = reveal;
+                    requestAnimationFrame(fadeIn);
+                }
+            };
+            fadeIn();
+        }, undefined, (err) => {
+            console.error("Failed to load galaxy texture:", err);
+        });
 
         window.addEventListener('resize', onWindowResize);
         document.addEventListener('mousemove', onMouseMove);
@@ -194,6 +228,12 @@ export function CosmicBackground() {
             nebula.rotation.z += 0.0005;
             nebula.position.x = targetX * 30;
             nebula.position.y = -targetY * 30;
+        }
+
+        if (container.andromeda) {
+            // Sync with stars parallax (50 offset)
+            container.andromeda.position.x = 0 + targetX * 50;
+            container.andromeda.position.y = 0 - targetY * 50;
         }
 
         if (renderer && scene && camera) {

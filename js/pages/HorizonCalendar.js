@@ -223,15 +223,15 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     container.innerHTML = `
-        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-md);">
+        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-xl);">
             <button id="prev-month" class="btn btn-secondary">&lt;</button>
-            <h3>${monthNames[month]} ${year}</h3>
+            <h2 style="font-weight: 700; letter-spacing: -0.5px;">${monthNames[month]} ${year}</h2>
             <button id="next-month" class="btn btn-secondary">&gt;</button>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; color: var(--color-text-muted);">
-            <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+        <div class="calendar-weekday-header">
+            <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
         </div>
-        <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;"></div>
+        <div id="days-grid" class="calendar-grid"></div>
     `;
 
     container.querySelector('#prev-month').onclick = () => onNav(-1);
@@ -248,23 +248,17 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
 
     // Days
     for (let i = 1; i <= daysInMonth; i++) {
-        const dayBtn = document.createElement('button');
-        dayBtn.className = 'card';
-        dayBtn.style.padding = '10px';
-        dayBtn.style.minHeight = '110px'; // Desktop size
-        dayBtn.style.display = 'flex';
-        dayBtn.style.flexDirection = 'column';
-        dayBtn.style.alignItems = 'flex-start';
-        dayBtn.style.justifyContent = 'flex-start';
-        dayBtn.style.textAlign = 'left';
-        dayBtn.style.cursor = 'pointer';
-        dayBtn.style.transition = 'transform 0.1s';
-        dayBtn.style.position = 'relative';
+        const dayBtn = document.createElement('div');
+        dayBtn.className = 'calendar-day';
 
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const dayEvents = events.filter(e => e.date === dateStr);
 
-        dayBtn.innerHTML = `<span style="font-weight: bold; font-size: 1.1rem; color: var(--color-text-primary); margin-bottom: 8px;">${i}</span>`;
+        // Day Header
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = i;
+        dayBtn.appendChild(dayHeader);
 
         // --- MOON PHASE LOGIC ---
         const currentDayDate = new Date(date.getFullYear(), date.getMonth(), i);
@@ -278,22 +272,13 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
                 const isPast = eventDate < today;
 
                 const eventPill = document.createElement('div');
-                eventPill.style.fontSize = '0.8rem'; // Larger text
-                eventPill.style.marginTop = '4px';
-                eventPill.style.padding = '3px 8px';
-                eventPill.style.borderRadius = '4px';
-                eventPill.style.width = '100%';
-                eventPill.style.whiteSpace = 'nowrap';
-                eventPill.style.overflow = 'hidden';
-                eventPill.style.textOverflow = 'ellipsis';
+                eventPill.className = 'calendar-event-pill';
                 eventPill.textContent = evt.title;
 
                 if (isPast) {
                     eventPill.style.background = 'rgba(255, 255, 255, 0.1)';
                     eventPill.style.color = 'var(--color-text-muted)';
-                } else {
-                    eventPill.style.background = 'rgba(52, 152, 219, 0.2)';
-                    eventPill.style.color = '#3498db';
+                    eventPill.style.borderLeftColor = 'rgba(255, 255, 255, 0.2)';
                 }
 
                 // Click specific event
@@ -304,7 +289,7 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
 
                 dayBtn.appendChild(eventPill);
             });
-            dayBtn.style.borderColor = 'var(--color-status-info)';
+            dayBtn.style.borderColor = 'rgba(52, 152, 219, 0.3)';
         } else {
             // Show Centered Moon Phase if no events
             const moonDiv = document.createElement('div');
