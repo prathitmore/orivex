@@ -12,8 +12,17 @@ export async function RequestsPage() {
     `;
 
     try {
-        const requests = await DataService.getRequestsForUser(user.id);
-        const pending = requests.filter(req => req.status === 'pending');
+        const [requests, acceptedEvents] = await Promise.all([
+            DataService.getRequestsForUser(user.id),
+            DataService.getAcceptedEvents(user.id)
+        ]);
+
+        const acceptedEventIds = new Set(acceptedEvents.map(e => e.id));
+
+        // Filter: Must be pending AND not already part of an accepted event
+        const pending = requests.filter(req =>
+            req.status === 'pending' && !acceptedEventIds.has(req.event_id)
+        );
 
         if (pending.length === 0) {
             container.innerHTML += `<p class="text-center" style="margin-top: var(--spacing-xl);">No pending requests.</p>`;
