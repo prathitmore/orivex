@@ -21,10 +21,10 @@ export function Layout(content) {
     header.style.zIndex = '100';
 
     header.innerHTML = `
-        <img src="assets/orivex_logo.png" alt="Orivex" style="height: 32px;"> <!-- Reduced from 50px -->
-        <div id="user-avatar" style="width: 32px; height: 32px; background: var(--color-bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;">
+        <div id="user-avatar" onclick="window.location.hash='#/profile'" style="width: 32px; height: 32px; background: var(--color-bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;">
             <!-- Avatar initial -->
         </div>
+        <img src="assets/orivex_logo.png" alt="Orivex" style="height: 32px;"> <!-- Reduced from 50px -->
     `;
 
     // Main Content Area
@@ -72,8 +72,7 @@ export function Layout(content) {
             { icon: '🌍', label: 'Horizon', path: '#/calendar' },
             { icon: '🗓️', label: 'Events', path: '#/events' },
             { icon: '💰', label: 'Pay', path: '#/expenses' }, // Shortened label
-            { icon: '👥', label: 'Team', path: '#/astronomers' },
-            { icon: '👤', label: 'Profile', path: '#/profile' }
+            { icon: '👥', label: 'Team', path: '#/astronomers' }
         ];
     } else if (role === 'astronomer' || role === 'stargazer') {
         navItems = [
@@ -81,8 +80,7 @@ export function Layout(content) {
             { icon: '🌍', label: 'Horizon', path: '#/calendar' },
             { icon: '💰', label: 'Pay', path: '#/expenses' }, // Shortened label
             { icon: '⏰', label: 'Avail', path: '#/availability' }, // Shortened label
-            { icon: '📩', label: 'Reqs', path: '#/requests' }, // Shortened label
-            { icon: '👤', label: 'Profile', path: '#/profile' }
+            { icon: '📩', label: 'Reqs', path: '#/requests' } // Shortened label
         ];
     }
 
