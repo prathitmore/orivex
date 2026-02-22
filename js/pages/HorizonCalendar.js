@@ -270,7 +270,7 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     container.innerHTML = `
-        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-xl);">
+        <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-sm);">
             <button id="prev-month" class="btn btn-secondary">&lt;</button>
             <h2 style="font-weight: 700; letter-spacing: -0.5px;">${monthNames[month]} ${year}</h2>
             <button id="next-month" class="btn btn-secondary">&gt;</button>
@@ -355,8 +355,8 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
             moonDiv.style.width = '100%';
 
             moonDiv.innerHTML = `
-                <div style="font-size: 1.5rem; margin-bottom: 4px;">${moon.icon}</div>
-                <div style="font-size: 0.75rem; color: var(--color-text-secondary);">${moon.illumination}%</div>
+                <div style="font-size: 2.25rem; margin-bottom: 2px; line-height: 1;">${moon.icon}</div>
+                <div style="font-size: 0.85rem; color: var(--color-text-secondary); font-weight: 500;">${moon.illumination}%</div>
             `;
             moonDiv.title = `${moon.name} (${moon.illumination}%)`;
             dayBtn.appendChild(moonDiv);
