@@ -18,6 +18,7 @@ export async function HorizonCalendarPage() {
     let currentDate = new Date();
     let selectedDate = null;
     let selectedEventId = null;
+    let allUsers = [];
     let allAvailability = [];
 
     // Check for query param
