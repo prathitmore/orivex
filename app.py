@@ -684,10 +684,9 @@ def download_android_app():
         abort(404)
         
     return send_from_directory(
-        directory=latest_dir,
-        path=filename,
+        latest_dir, 
+        filename,
         as_attachment=True,
-        download_name='Orivex-Horizon-Mobile.apk',
         mimetype='application/vnd.android.package-archive'
     )
 
