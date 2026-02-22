@@ -18,7 +18,7 @@ export async function HorizonCalendarPage() {
     let currentDate = new Date();
     let selectedDate = null;
     let selectedEventId = null;
-    let allUsers = [];
+    let allAvailability = [];
 
     // Check for query param
     const hashParts = window.location.hash.split('?');
@@ -38,11 +38,13 @@ export async function HorizonCalendarPage() {
 
     // Initial Data Load
     try {
-        const [events, users] = await Promise.all([
+        const [events, users, availability] = await Promise.all([
             DataService.getEvents(),
-            DataService.getUsers()
+            DataService.getUsers(),
+            currentUser.roles.includes('manager') ? DataService.getAllAvailability() : Promise.resolve([])
         ]);
         allUsers = users;
+        allAvailability = availability;
 
         // Render Initial
         renderApp();
@@ -89,6 +91,7 @@ export async function HorizonCalendarPage() {
                     <button id="back-cal" class="btn btn-secondary" style="margin-bottom: var(--spacing-md);">← Back to Month</button>
                     <h3 style="margin-bottom: var(--spacing-md); font-size: 1.5rem;">${selectedDate}</h3>
                     <div id="day-events-list" class="flex flex-col" style="gap: var(--spacing-md);"></div>
+                    <div id="day-availability-list" style="margin-top: var(--spacing-xl);"></div>
                 </div>
             `;
 
@@ -102,42 +105,41 @@ export async function HorizonCalendarPage() {
 
             if (dayEvents.length === 0) {
                 list.innerHTML = '<p class="text-muted">No events scheduled.</p>';
-                return;
-            }
+            } else {
 
-            dayEvents.forEach(evt => {
-                // Check visibility
-                const isAssigned = evt.assigned.includes(currentUser.id);
-                const canView = currentUser.roles.includes('manager') || isAssigned;
+                dayEvents.forEach(evt => {
+                    // Check visibility
+                    const isAssigned = evt.assigned.includes(currentUser.id);
+                    const canView = currentUser.roles.includes('manager') || isAssigned;
 
-                if (!canView) return;
+                    if (!canView) return;
 
-                const eventCard = document.createElement('div');
-                eventCard.className = 'card interactive'; // interactive for hover
-                eventCard.style.borderLeft = '4px solid var(--color-accent)';
-                eventCard.style.cursor = 'pointer';
+                    const eventCard = document.createElement('div');
+                    eventCard.className = 'card interactive'; // interactive for hover
+                    eventCard.style.borderLeft = '4px solid var(--color-accent)';
+                    eventCard.style.cursor = 'pointer';
 
-                // Map assigned IDs to Names
-                const assignedNames = evt.assigned.map(uid => {
-                    const u = allUsers.find(user => user.id === uid);
-                    return u ? u.name : 'Unknown';
-                }).join(', ');
+                    // Map assigned IDs to Names
+                    const assignedNames = evt.assigned.map(uid => {
+                        const u = allUsers.find(user => user.id === uid);
+                        return u ? u.name : 'Unknown';
+                    }).join(', ');
 
-                // Check expansion state
-                let isExpanded = (selectedEventId === evt.id);
-                // If no specific event selected, maybe expand all? Or collapse all? Let's collapse all by default unless one targeted.
+                    // Check expansion state
+                    let isExpanded = (selectedEventId === evt.id);
+                    // If no specific event selected, maybe expand all? Or collapse all? Let's collapse all by default unless one targeted.
 
-                // Helper to render content
-                const renderContent = async () => {
-                    // Check moon phase for this event
-                    const moon = getMoonPhase(new Date(evt.date));
+                    // Helper to render content
+                    const renderContent = async () => {
+                        // Check moon phase for this event
+                        const moon = getMoonPhase(new Date(evt.date));
 
-                    const eventDate = new Date(evt.date);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const isPast = eventDate < today;
+                        const eventDate = new Date(evt.date);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const isPast = eventDate < today;
 
-                    eventCard.innerHTML = `
+                        eventCard.innerHTML = `
                         <div class="flex justify-between items-start">
                             <div style="flex: 1;">
                                 <h4 style="margin: 0 0 4px 0; font-size: 1.25rem;">${evt.title}</h4>
@@ -172,41 +174,85 @@ export async function HorizonCalendarPage() {
                         </div>
                     `;
 
-                    // Re-attach delete listener if rendered
-                    if (isExpanded && currentUser.roles.includes('manager')) {
-                        const delBtn = eventCard.querySelector('.delete-evt-btn');
-                        if (delBtn) {
-                            delBtn.onclick = async (e) => {
-                                e.stopPropagation();
-                                if (confirm('Are you sure you want to cancel this event?')) {
-                                    await DataService.deleteEvent(evt.id);
-                                    const idx = events.findIndex(e => e.id === evt.id);
-                                    if (idx > -1) events.splice(idx, 1);
-                                    if (selectedEventId === evt.id) selectedEventId = null;
-                                    renderApp(); // Refresh
-                                }
-                            };
+                        // Re-attach delete listener if rendered
+                        if (isExpanded && currentUser.roles.includes('manager')) {
+                            const delBtn = eventCard.querySelector('.delete-evt-btn');
+                            if (delBtn) {
+                                delBtn.onclick = async (e) => {
+                                    e.stopPropagation();
+                                    if (confirm('Are you sure you want to cancel this event?')) {
+                                        await DataService.deleteEvent(evt.id);
+                                        const idx = events.findIndex(e => e.id === evt.id);
+                                        if (idx > -1) events.splice(idx, 1);
+                                        if (selectedEventId === evt.id) selectedEventId = null;
+                                        renderApp(); // Refresh
+                                    }
+                                };
+                            }
                         }
-                    }
-                };
+                    };
 
-                renderContent();
-
-                eventCard.onclick = () => {
-                    isExpanded = !isExpanded;
                     renderContent();
-                    // If expanding, maybe close others?
-                    // Optional: close others logic here if we had access to other cards, 
-                    // but simple toggle is often better for comparison.
-                    if (isExpanded) {
-                        selectedEventId = evt.id; // update state
-                    } else {
-                        if (selectedEventId === evt.id) selectedEventId = null;
-                    }
-                };
 
-                list.appendChild(eventCard);
-            });
+                    eventCard.onclick = () => {
+                        isExpanded = !isExpanded;
+                        renderContent();
+                        if (isExpanded) {
+                            selectedEventId = evt.id;
+                        } else {
+                            if (selectedEventId === evt.id) selectedEventId = null;
+                        }
+                    };
+
+                    list.appendChild(eventCard);
+                });
+            }
+
+            if (currentUser.roles.includes('manager')) {
+                const availList = target.querySelector('#day-availability-list');
+                const astronomers = allUsers.filter(u => u.roles.includes('astronomer'));
+
+                let availHtml = `<h4 style="margin-bottom: var(--spacing-md); color: var(--color-text-secondary); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">Astronomer Availability</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--spacing-sm);">`;
+
+                astronomers.forEach(usr => {
+                    const statusRecord = allAvailability.find(a => String(a.user_id) === String(usr.id) && a.date === selectedDate);
+                    const status = statusRecord ? statusRecord.status : 'unknown';
+
+                    let statusColor = 'inherit';
+                    let statusBg = 'rgba(255,255,255,0.05)';
+                    let statusText = 'Unknown';
+                    let statusBorder = 'rgba(255,255,255,0.1)';
+
+                    if (status === 'available') {
+                        statusColor = 'var(--color-status-success)';
+                        statusBg = 'rgba(46, 204, 113, 0.05)';
+                        statusBorder = 'rgba(46, 204, 113, 0.3)';
+                        statusText = 'Available';
+                    }
+                    else if (status === 'maybe') {
+                        statusColor = 'var(--color-status-warning)';
+                        statusBg = 'rgba(243, 156, 18, 0.05)';
+                        statusBorder = 'rgba(243, 156, 18, 0.3)';
+                        statusText = 'Maybe';
+                    }
+                    else if (status === 'unavailable') {
+                        statusColor = 'var(--color-status-danger)';
+                        statusBg = 'rgba(231, 76, 60, 0.05)';
+                        statusBorder = 'rgba(231, 76, 60, 0.3)';
+                        statusText = 'Busy';
+                    }
+
+                    availHtml += `
+                    <div style="padding: 12px; display: flex; align-items: center; justify-content: space-between; background: ${statusBg}; border: 1px solid ${statusBorder}; border-radius: var(--radius-md);">
+                        <span style="font-weight: 500;">${usr.name}</span>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: ${statusColor}; text-transform: uppercase;">${statusText}</span>
+                    </div>
+                `;
+                });
+                availHtml += `</div>`;
+                availList.innerHTML = availHtml;
+            }
         }
 
     } catch (e) {
