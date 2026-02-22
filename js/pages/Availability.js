@@ -108,6 +108,12 @@ export async function AvailabilityPage() {
             today.setHours(0, 0, 0, 0);
             const isPast = cellDate < today;
 
+            const realToday = new Date();
+            const realTodayKey = `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
+            if (dateKey === realTodayKey) {
+                dayBtn.classList.add('calendar-day-today');
+            }
+
             if (status === 'available') {
                 dayBtn.style.borderColor = 'var(--color-status-success)';
                 dayBtn.style.background = 'rgba(46, 204, 113, 0.1)';

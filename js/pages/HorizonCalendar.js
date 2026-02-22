@@ -252,6 +252,13 @@ function renderCalendar(date, container, events, onNav, onDayClick) {
         dayBtn.className = 'calendar-day';
 
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        if (dateStr === todayStr) {
+            dayBtn.classList.add('calendar-day-today');
+        }
+
         const dayEvents = events.filter(e => e.date === dateStr);
 
         // Day Header
