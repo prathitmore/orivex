@@ -2,7 +2,7 @@
 import mimetypes
 import os
 import urllib.parse
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, abort
 from flask_cors import CORS
 import json
 import uuid
@@ -675,6 +675,21 @@ def reset_password_confirm():
     db.session.execute(text("DELETE FROM otp_codes WHERE email=:e"), {"e": email})
     db.session.commit()
     return jsonify({"success": True})
+
+@app.route('/api/download/android-app', methods=['GET'])
+def download_android_app():
+    latest_dir = os.path.join(BASE_DIR, 'assets', 'latest')
+    filename = 'app-debug.apk'
+    if not os.path.exists(os.path.join(latest_dir, filename)):
+        abort(404)
+        
+    return send_from_directory(
+        directory=latest_dir,
+        path=filename,
+        as_attachment=True,
+        download_name='Orivex-Horizon-Mobile.apk',
+        mimetype='application/vnd.android.package-archive'
+    )
 
 # --- Init ---
 # with app.app_context():
