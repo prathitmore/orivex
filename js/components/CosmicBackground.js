@@ -151,11 +151,21 @@ export function CosmicBackground() {
         const loader = new THREE.TextureLoader();
         loader.load('assets/andromeda.jpg', (texture) => {
             const img = texture.image;
+
+            // Downscale to avoid CPU/Memory crashes during pixel manipulation
+            const MAX_SIZE = 1024;
+            let scale = 1;
+            if (img.width > MAX_SIZE || img.height > MAX_SIZE) {
+                scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height);
+            }
+
             const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
+            canvas.width = Math.floor(img.width * scale);
+            canvas.height = Math.floor(img.height * scale);
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+            // Draw image scaled down
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imgData.data;
