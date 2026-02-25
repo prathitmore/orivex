@@ -729,4 +729,5 @@ def download_android_app():
 #        print(f"Startup Schema Init Warning: {e}")
 
 if __name__ == '__main__':
+    # Triggering fresh deployment build
     app.run(host='0.0.0.0', port=5000, debug=True)
