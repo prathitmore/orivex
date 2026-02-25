@@ -688,7 +688,21 @@ def get_app_landing():
 
 @app.route('/api/download/android-app')
 def download_android_app():
-    return redirect("https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk")
+    # DIRECT STREAM - NO REDIRECTS
+    # This bypasses iframe blocks by serving the file specifically with attachment headers
+    try:
+        from flask import send_file
+        import os
+        BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(BASE_DIR, 'horizon.apk')
+        return send_file(
+            path,
+            as_attachment=True,
+            download_name='Orivex-Horizon-App.apk',
+            mimetype='application/vnd.android.package-archive'
+        )
+    except Exception as e:
+        return f"Download server is busy. Please try the mirror link below. Error: {str(e)}", 500
 
 # --- Init ---
 # with app.app_context():
