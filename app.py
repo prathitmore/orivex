@@ -678,23 +678,39 @@ def reset_password_confirm():
 
 @app.route('/api/download/android-app', methods=['GET'])
 def download_android_app():
+    import sys
     try:
         latest_dir = os.path.join(BASE_DIR, 'assets', 'latest')
         filename = 'app-debug.apk'
         filepath = os.path.join(latest_dir, filename)
         
+        print(f"Attempting to serve APK from: {filepath}", file=sys.stderr)
+        
         if not os.path.exists(filepath):
-            return f"File not found at {filepath}", 404
+            print(f"Error: File not found at {filepath}", file=sys.stderr)
+            return f"File not found on server", 404
             
         from flask import send_file
-        return send_file(
-            filepath,
-            as_attachment=True,
-            download_name='Orivex-Horizon-Mobile.apk',
-            mimetype='application/vnd.android.package-archive'
-        )
+        try:
+            # Modern Flask (2.0+)
+            return send_file(
+                filepath,
+                as_attachment=True,
+                download_name='Orivex-Horizon-Mobile.apk',
+                mimetype='application/vnd.android.package-archive'
+            )
+        except TypeError:
+            # Older Flask (< 2.0)
+            print("Falling back to attachment_filename for older Flask version", file=sys.stderr)
+            return send_file(
+                filepath,
+                as_attachment=True,
+                attachment_filename='Orivex-Horizon-Mobile.apk',
+                mimetype='application/vnd.android.package-archive'
+            )
     except Exception as e:
-        return str(e), 500
+        print(f"Download Error: {str(e)}", file=sys.stderr)
+        return f"Download failed: {str(e)}", 500
 
 # --- Init ---
 # with app.app_context():
