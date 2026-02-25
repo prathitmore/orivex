@@ -681,10 +681,44 @@ def reset_password_confirm():
 def hc_endpoint():
     return "OK", 200
 
+@app.route('/get-app')
+def get_app_landing():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Downloading Horizon App</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body { font-family: -apple-system, sans-serif; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+            .card { background: #111; padding: 40px; border-radius: 20px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 90%; }
+            .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #007bff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            h1 { font-size: 22px; margin-bottom: 10px; }
+            p { color: #888; font-size: 14px; }
+            .btn { display: inline-block; background: #333; color: #fff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-size: 14px; margin-top: 20px; }
+        </style>
+        <script>
+            setTimeout(function() {
+                window.location.href = "https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk";
+            }, 1000);
+        </script>
+    </head>
+    <body>
+        <div class="card">
+            <div class="spinner"></div>
+            <h1>Starting Download...</h1>
+            <p>Your download will begin in a moment.</p>
+            <p style="font-size: 12px;">If it doesn't start, click below:</p>
+            <a href="https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk" class="btn">Download Manually</a>
+        </div>
+    </body>
+    </html>
+    """
+
 @app.route('/api/download/android-app')
 def download_android_app():
-    # Redirect to GitHub Mirror to save server resources and avoid 500 errors for large files
-    return redirect("https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk")
+    return redirect("/get-app")
 
 # --- Init ---
 # with app.app_context():
