@@ -41,6 +41,18 @@ export function LoginPage() {
         </form>
         
         <div id="error-msg" style="color: var(--color-status-danger); margin-top: var(--spacing-md); font-size: 0.9rem; min-height: 20px;"></div>
+        
+        <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);">Prefer the Mobile App?</p>
+            <a href="https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk" 
+               class="btn btn-outline w-full" 
+               style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 12px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4483-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0004.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.4158.4158 0 0 0-.1521-.5676.4162.4162 0 0 0-.5676.1525l-2.0312 3.518a11.8385 11.8385 0 0 0-5.1279-1.1895c-1.8023 0-3.5074.4091-5.1279 1.1895L4.8404 5.4476a.4158.4158 0 0 0-.5676-.1525.4158.4158 0 0 0-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+                </svg>
+                Download for Android
+            </a>
+        </div>
     `;
 
     container.appendChild(card);
