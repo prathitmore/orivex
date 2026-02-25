@@ -683,44 +683,12 @@ def hc_endpoint():
 
 @app.route('/get-app')
 def get_app_landing():
-    return """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Download Horizon App</title>
-        <style>
-            body { font-family: sans-serif; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .card { background: #111; padding: 40px; border-radius: 20px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-            .btn { display: block; background: #007bff; color: white; padding: 20px 40px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 20px; margin-top: 20px; }
-        </style>
-    </head>
-    <body>
-        <div class="card">
-            <h1>Horizon App</h1>
-            <p>Click below to start official download</p>
-            <a href="/api/download/android-app?force=true" class="btn">START DOWNLOAD</a>
-            <p style="color: #666; font-size: 12px; margin-top: 20px;">Filename: Horizon.apk | Size: 48MB</p>
-        </div>
-    </body>
-    </html>
-    """
+    # Direct redirect to GitHub mirror for maximum stability
+    return redirect("https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk")
 
 @app.route('/api/download/android-app')
 def download_android_app():
-    try:
-        target = os.path.join(os.path.dirname(__file__), 'assets', 'latest', 'app-debug.apk')
-        from flask import send_file
-        return send_file(
-            target,
-            mimetype='application/vnd.android.package-archive',
-            as_attachment=True,
-            download_name='Orivex-Horizon.apk'
-        )
-    except Exception:
-        # Emergency Mirror Redirect
-        return redirect("https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk")
+    return redirect("https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk")
 
 # --- Init ---
 # with app.app_context():
