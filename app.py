@@ -11,6 +11,7 @@ from email.mime.text import MIMEText
 import random
 import string
 import datetime
+import threading
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 import traceback
@@ -676,41 +677,20 @@ def reset_password_confirm():
     db.session.commit()
     return jsonify({"success": True})
 
-@app.route('/api/download/android-app', methods=['GET'])
+@app.route('/api/download/android-app')
 def download_android_app():
-    import sys
     try:
         latest_dir = os.path.join(BASE_DIR, 'assets', 'latest')
         filename = 'app-debug.apk'
+        
+        # Absolute path check
         filepath = os.path.join(latest_dir, filename)
-        
-        print(f"Attempting to serve APK from: {filepath}", file=sys.stderr)
-        
-        if not os.path.exists(filepath):
-            print(f"Error: File not found at {filepath}", file=sys.stderr)
-            return f"File not found on server", 404
-            
-        from flask import send_file
-        try:
-            # Modern Flask (2.0+)
-            return send_file(
-                filepath,
-                as_attachment=True,
-                download_name='Orivex-Horizon-Mobile.apk',
-                mimetype='application/vnd.android.package-archive'
-            )
-        except TypeError:
-            # Older Flask (< 2.0)
-            print("Falling back to attachment_filename for older Flask version", file=sys.stderr)
-            return send_file(
-                filepath,
-                as_attachment=True,
-                attachment_filename='Orivex-Horizon-Mobile.apk',
-                mimetype='application/vnd.android.package-archive'
-            )
+        if not os.path.isfile(filepath):
+             return f"Error: APK file not found at {filepath}", 404
+             
+        return send_from_directory(latest_dir, filename, as_attachment=True)
     except Exception as e:
-        print(f"Download Error: {str(e)}", file=sys.stderr)
-        return f"Download failed: {str(e)}", 500
+        return f"Server Error: {str(e)}", 500
 
 # --- Init ---
 # with app.app_context():
