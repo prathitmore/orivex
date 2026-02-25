@@ -688,51 +688,39 @@ def get_app_landing():
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Download Horizon App</title>
         <style>
-            :root { --primary: #007bff; --bg: #000000; --card: #111111; --text: #ffffff; }
-            body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
-            .container { text-align: center; padding: 40px 20px; background: var(--card); border-radius: 24px; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 90%; max-width: 400px; animation: slideUp 0.5s ease-out; }
-            @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-            .icon { font-size: 60px; margin-bottom: 20px; display: inline-block; background: rgba(0,123,255,0.1); width: 100px; height: 100px; line-height: 100px; border-radius: 50%; color: var(--primary); }
-            h1 { font-size: 24px; margin: 0 0 10px 0; font-weight: 700; }
-            p { color: #888; font-size: 15px; margin-bottom: 30px; line-height: 1.5; }
-            .download-btn { display: block; background: var(--primary); color: white; padding: 18px 20px; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: 18px; transition: transform 0.2s; box-shadow: 0 10px 25px rgba(0,123,255,0.3); margin-bottom: 15px; }
-            .download-btn:active { transform: scale(0.97); }
-            .small-text { font-size: 12px; color: #555; }
+            body { font-family: sans-serif; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .card { background: #111; padding: 40px; border-radius: 20px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+            .btn { display: block; background: #007bff; color: white; padding: 20px 40px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 20px; margin-top: 20px; }
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="icon">⏬</div>
-            <h1>Ready to Install</h1>
-            <p>Tap the button below to download the latest Horizon Orivex APK for Android.</p>
-            
-            <a href="https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk" 
-               class="download-btn"
-               id="dLnk">
-               CONFIRM DOWNLOAD
-            </a>
-            
-            <div class="small-text">
-                File: Horizon-Orivex-Mobile.apk (48MB)
-            </div>
+        <div class="card">
+            <h1>Horizon App</h1>
+            <p>Click below to start official download</p>
+            <a href="/api/download/android-app?force=true" class="btn">START DOWNLOAD</a>
+            <p style="color: #666; font-size: 12px; margin-top: 20px;">Filename: Horizon.apk | Size: 48MB</p>
         </div>
-        <script>
-            // Try automatic trigger but keep button for Chrome/Mobile
-            setTimeout(() => {
-                const link = document.getElementById('dLnk');
-                link.click();
-            }, 1500);
-        </script>
     </body>
     </html>
     """
 
 @app.route('/api/download/android-app')
 def download_android_app():
-    return redirect("/get-app")
+    try:
+        target = os.path.join(os.path.dirname(__file__), 'assets', 'latest', 'app-debug.apk')
+        from flask import send_file
+        return send_file(
+            target,
+            mimetype='application/vnd.android.package-archive',
+            as_attachment=True,
+            download_name='Orivex-Horizon.apk'
+        )
+    except Exception:
+        # Emergency Mirror Redirect
+        return redirect("https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk")
 
 # --- Init ---
 # with app.app_context():
