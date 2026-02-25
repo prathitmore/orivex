@@ -169,7 +169,7 @@ def init_schema():
 # --- Routes ---
 
 @app.route('/health')
-def health_check():
+def health_endpoint():
     return jsonify({"status": "healthy"}), 200
 
 
@@ -593,7 +593,7 @@ def delete_location(loc_id):
 
 # --- Auth ---
 
-import threading
+# --- Email ---
 
 def send_email_async(recipient, subject, body):
     try:
@@ -678,7 +678,7 @@ def reset_password_confirm():
     return jsonify({"success": True})
 
 @app.route('/hc')
-def health_check():
+def hc_endpoint():
     return "OK", 200
 
 @app.route('/api/download/android-app')
