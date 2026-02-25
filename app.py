@@ -677,35 +677,28 @@ def reset_password_confirm():
     db.session.commit()
     return jsonify({"success": True})
 
+@app.route('/hc')
+def health_check():
+    return "OK", 200
+
 @app.route('/api/download/android-app')
 def download_android_app():
     try:
-        from flask import Response
-        latest_dir = os.path.join(BASE_DIR, 'assets', 'latest')
-        filename = 'app-debug.apk'
-        filepath = os.path.join(latest_dir, filename)
+        # Use absolute path directly
+        target = os.path.join(os.path.dirname(__file__), 'assets', 'latest', 'app-debug.apk')
         
-        if not os.path.isfile(filepath):
-             return f"Error: APK file not found on server", 404
-             
-        def generate():
-            with open(filepath, "rb") as f:
-                while True:
-                    chunk = f.read(1024 * 1024) # 1MB chunks
-                    if not chunk:
-                        break
-                    yield chunk
-                    
-        return Response(
-            generate(),
+        if not os.path.exists(target):
+            return f"File not found on server at {target}", 404
+            
+        from flask import send_file
+        return send_file(
+            target,
             mimetype='application/vnd.android.package-archive',
-            headers={
-                "Content-Disposition": "attachment; filename=Orivex-Horizon.apk",
-                "Content-Type": "application/vnd.android.package-archive"
-            }
+            as_attachment=True,
+            download_name='Orivex-Horizon.apk'
         )
     except Exception as e:
-        return f"Server Error: {str(e)}", 500
+        return f"Download Error: {str(e)}", 500
 
 # --- Init ---
 # with app.app_context():
