@@ -2,7 +2,7 @@
 import mimetypes
 import os
 import urllib.parse
-from flask import Flask, request, jsonify, send_from_directory, abort
+from flask import Flask, request, jsonify, send_from_directory, abort, redirect
 from flask_cors import CORS
 import json
 import uuid
@@ -683,22 +683,8 @@ def hc_endpoint():
 
 @app.route('/api/download/android-app')
 def download_android_app():
-    try:
-        # Use absolute path directly
-        target = os.path.join(os.path.dirname(__file__), 'assets', 'latest', 'app-debug.apk')
-        
-        if not os.path.exists(target):
-            return f"File not found on server at {target}", 404
-            
-        from flask import send_file
-        return send_file(
-            target,
-            mimetype='application/vnd.android.package-archive',
-            as_attachment=True,
-            download_name='Orivex-Horizon.apk'
-        )
-    except Exception as e:
-        return f"Download Error: {str(e)}", 500
+    # Redirect to GitHub Mirror to save server resources and avoid 500 errors for large files
+    return redirect("https://github.com/prathitmore/orivex/raw/main/assets/latest/app-debug.apk")
 
 # --- Init ---
 # with app.app_context():
