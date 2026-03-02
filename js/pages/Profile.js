@@ -115,7 +115,9 @@ export async function ProfilePage() {
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
             ${user.roles.length > 1 ? `
                 <div class="card clickable-action" style="padding: 16px; cursor: pointer; display: flex; align-items: center; gap: 12px;" onclick="window.location.hash='#/role-select'">
-                    <div style="font-size: 1.2rem; min-width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center;">🔄</div>
+                    <div style="min-width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    </div>
                     <div>
                         <div style="font-weight: 600; font-size: 0.9rem;">Switch Role</div>
                         <div style="font-size: 0.7rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Change active perspective</div>
@@ -126,7 +128,9 @@ export async function ProfilePage() {
             ${user.roles.includes('manager') ? `
                 <div class="card clickable-action" style="padding: 16px; cursor: pointer; border: 1px dashed rgba(74, 144, 226, 0.4);" onclick="window.location.hash='#/create-user'">
                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="font-size: 1.2rem; color: var(--color-accent); min-width: 32px; height: 32px; background: rgba(74, 144, 226, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">👤+</div>
+                        <div style="color: var(--color-accent); min-width: 32px; height: 32px; background: rgba(74, 144, 226, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="16" y1="11" x2="22" y2="11"></line></svg>
+                        </div>
                         <div>
                             <div style="font-weight: 600; font-size: 0.9rem; color: var(--color-accent);">Onboard User</div>
                             <div style="font-size: 0.7rem; color: var(--color-text-muted);">Invite new members</div>
@@ -137,7 +141,9 @@ export async function ProfilePage() {
 
             <div id="sign-out-btn" class="card clickable-action" style="padding: 16px; cursor: pointer; border: 1px solid rgba(248, 113, 113, 0.2);">
                  <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="font-size: 1.2rem; color: var(--color-status-danger); min-width: 32px; height: 32px; background: rgba(248, 113, 113, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">⏻</div>
+                    <div style="color: var(--color-status-danger); min-width: 32px; height: 32px; background: rgba(248, 113, 113, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                    </div>
                     <div>
                         <div style="font-weight: 600; font-size: 0.9rem; color: var(--color-status-danger);">Log Out</div>
                         <div style="font-size: 0.7rem; color: var(--color-text-muted);">End current session</div>
@@ -150,7 +156,9 @@ export async function ProfilePage() {
         ${user.roles.includes('manager') ? `
              <div class="card" style="padding: 16px; margin-top: 12px;">
                 <div class="flex items-center" style="gap: 10px; margin-bottom: 12px;">
-                    <div style="font-size: 1.1rem;">📍</div>
+                    <div style="color: var(--color-text-muted);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </div>
                     <h3 style="font-size: 1rem; margin: 0;">Observatory Locations</h3>
                 </div>
                 
