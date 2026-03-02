@@ -75,7 +75,7 @@ export function Layout(content) {
 
     // Determine Nav Items based on Role
     let role = 'astronomer';
-    const userStr = sessionStorage.getItem('orivex_user');
+    const userStr = sessionStorage.getItem('orivex_user') || localStorage.getItem('orivex_user');
     if (userStr) {
         const user = JSON.parse(userStr);
         role = user.currentRole || 'astronomer';
@@ -142,11 +142,11 @@ export function Layout(content) {
 
     // Update avatar if user exists
     setTimeout(() => {
-        const userStr = sessionStorage.getItem('orivex_user');
+        const userStr = sessionStorage.getItem('orivex_user') || localStorage.getItem('orivex_user');
         if (userStr) {
             const user = JSON.parse(userStr);
             const avatarEl = container.querySelector('#user-avatar');
-            if (avatarEl) avatarEl.textContent = user.name.charAt(0);
+            if (avatarEl && user.name) avatarEl.textContent = user.name.charAt(0);
         }
     }, 0);
 

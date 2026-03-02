@@ -77,6 +77,7 @@ export async function HorizonCalendarPage() {
 
         function renderDayView(target) {
             let dayEvents = events.filter(e => e.date === selectedDate);
+            const moon = getMoonPhase(new Date(selectedDate));
 
             // Filter if specific event selected via pill click
             if (selectedEventId) {
@@ -90,7 +91,17 @@ export async function HorizonCalendarPage() {
             target.innerHTML = `
                 <div class="fade-in">
                     <button id="back-cal" class="btn btn-secondary" style="margin-bottom: var(--spacing-md);">← Back to Month</button>
-                    <h3 style="margin-bottom: var(--spacing-md); font-size: 1.5rem;">${selectedDate}</h3>
+                    <h3 style="margin-bottom: var(--spacing-sm); font-size: 1.5rem;">${selectedDate}</h3>
+                    
+                    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: 20px; border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="font-size: 3rem; line-height: 1;">${moon.icon}</div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;">Lunar Outlook</div>
+                            <div style="color: var(--color-text-primary); font-size: 1.2rem; font-weight: 600;">${moon.name}</div>
+                            <div style="color: var(--color-accent); font-size: 0.85rem; font-weight: 500;">${moon.illumination}% Illumination</div>
+                        </div>
+                    </div>
+
                     <div id="day-events-list" class="flex flex-col" style="gap: var(--spacing-md);"></div>
                     <div id="day-availability-list" style="margin-top: var(--spacing-xl);"></div>
                 </div>
