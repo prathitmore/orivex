@@ -17,6 +17,26 @@ export function LoginPage() {
     card.style.backdropFilter = 'blur(8px)';
     card.style.background = 'rgba(30, 41, 59, 0.4)';
 
+    // --- Auto Login for Remember Me ---
+    const savedUser = localStorage.getItem('orivex_user');
+    if (savedUser) {
+        try {
+            const user = JSON.parse(savedUser);
+            if (user) {
+                // Short delay to allow background to load
+                setTimeout(() => {
+                    if (user.roles.length > 1) {
+                        window.location.hash = '#/role-select';
+                    } else {
+                        window.location.hash = '#/dashboard';
+                    }
+                }, 100);
+            }
+        } catch (e) {
+            localStorage.removeItem('orivex_user');
+        }
+    }
+
     card.innerHTML = `
 
 
