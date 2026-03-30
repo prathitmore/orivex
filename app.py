@@ -53,8 +53,8 @@ db_uri = os.environ.get('DATABASE_URL')
 if not db_uri:
     # Fix user's password encoding: Superbase@143 -> Superbase%40143
     encoded_pass = urllib.parse.quote_plus("Superbase@143")
-    # Construct the URI (Transaction Pooler)
-    db_uri = f"postgresql+pg8000://postgres.xpzkrxsqvnvxwykqaipp:{encoded_pass}@aws-0-ap-south-1.pooler.supabase.com:6543/postgres"
+    # Construct the URI (Transaction Pooler - Using the specific host found in dashboard)
+    db_uri = f"postgresql+pg8000://postgres.xpzkrxsqvnvxwykqaipp:{encoded_pass}@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
 
 # Ensure correct protocol for SQLAlchemy (switch to pg8000 if using generic postgres)
 if db_uri and db_uri.startswith("postgres://"):
